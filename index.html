@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MatekVerseny – Kötélhúzás</title>
+<style>
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --blue: #2563eb;
+  --blue-light: #dbeafe;
+  --blue-dark: #1e40af;
+  --red: #dc2626;
+  --red-light: #fee2e2;
+  --red-dark: #991b1b;
+  --green: #16a34a;
+  --green-light: #dcfce7;
+  --yellow: #eab308;
+  --bg: #f0f4ff;
+  --card: #ffffff;
+  --text: #1e293b;
+  --muted: #64748b;
+  --radius: 16px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.10);
+  --rope-color: #92400e;
+  --rope-mid: #d97706;
+  --center-bg: #fef9c3;
+  --transition: 0.35s cubic-bezier(.4,0,.2,1);
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+}
+
+body { display: flex; flex-direction: column; height: 100vh; }
+
+/* ===== SCREENS ===== */
+.screen { display: none; width: 100%; height: 100%; }
+.screen.active { display: flex; }
+
+/* ===== SETUP SCREEN ===== */
+#setup-screen {
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 24px 16px;
+  overflow-y: auto;
+  background: linear-gradient(135deg, #dbeafe 0%, #f0f4ff 50%, #fee2e2 100%);
+}
+
+.setup-title {
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  font-weight: 900;
+  text-align: center;
+  margin-bottom: 8px;
+  background: linear-gradient(90deg, var(--blue-dark), var(--red-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.setup-subtitle {
+  color: var(--muted);
+  text-align: center;
+  margin-bottom: 24px;
+  font-size: 1rem;
+}
+
+.setup-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  width: 100%;
+  max-width: 640px;
+  margin-bottom: 16px;
+}
+
+.setup-card h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.setup-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.setup-label {
+  font-size: .95rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.toggle-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.toggle-btn {
+  padding: 10px 18px;
+  border-radius: 50px;
+  border: 2px solid #e2e8f0;
+  background: #f8fafc;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+  user-select: none;
+}
+
+.toggle-btn:hover { border-color: var(--blue); }
+.toggle-btn.active { background: var(--blue); color: white; border-color: var(--blue); }
+.toggle-btn.diff-easy.active { background: var(--green); border-color: var(--green); }
+.toggle-btn.diff-medium.active { background: var(--yellow); border-color: var(--yellow); color: #1e293b; }
+.toggle-btn.diff-hard.active { background: var(--red); border-color: var(--red); }
+
+.setup-input {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 2px solid #e2e8f0;
+  font-size: 1rem;
+  font-weight: 600;
+  background: #f8fafc;
+  transition: border-color .2s;
+  outline: none;
+}
+.setup-input:focus { border-color: var(--blue); }
+
+.team-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.team-inputs .blue-input:focus { border-color: var(--blue); }
+.team-inputs .red-input:focus { border-color: var(--red); }
+.team-inputs .blue-label { color: var(--blue-dark); }
+.team-inputs .red-label { color: var(--red-dark); }
+
+.setup-row-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.start-btn {
+  display: block;
+  width: 100%;
+  max-width: 640px;
+  padding: 20px;
+  border-radius: 50px;
+  border: none;
+  background: linear-gradient(90deg, var(--blue), var(--blue-dark));
+  color: white;
+  font-size: 1.4rem;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(37,99,235,0.4);
+  transition: transform .15s, box-shadow .15s;
+  letter-spacing: .02em;
+  margin-top: 8px;
+}
+.start-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(37,99,235,0.5); }
+.start-btn:active { transform: translateY(0); }
+
+/* ===== GAME SCREEN ===== */
+#game-screen {
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.game-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: var(--card);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.game-title {
+  font-weight: 900;
+  font-size: 1.1rem;
+  background: linear-gradient(90deg, var(--blue), var(--red));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.timer-display {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  min-width: 60px;
+  text-align: center;
+}
+.timer-display.urgent { color: var(--red); animation: pulse 1s infinite; }
+
+.header-btn {
+  padding: 6px 14px;
+  border-radius: 50px;
+  border: 2px solid #e2e8f0;
+  background: white;
+  font-size: .85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .2s;
+  color: var(--muted);
+}
+.header-btn:hover { border-color: var(--red); color: var(--red); }
+
+.game-body {
+  display: grid;
+  grid-template-columns: 1fr 280px 1fr;
+  flex: 1;
+  overflow: hidden;
+  gap: 0;
+}
+
+/* ===== TEAM PANELS ===== */
+.team-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.team-panel.blue { background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%); border-right: 3px solid var(--blue-light); }
+.team-panel.red { background: linear-gradient(180deg, #fff1f2 0%, #fee2e2 100%); border-left: 3px solid var(--red-light); }
+
+.team-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.team-name {
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  font-weight: 900;
+}
+.blue .team-name { color: var(--blue-dark); }
+.red .team-name { color: var(--red-dark); }
+
+.team-score {
+  font-size: clamp(1.4rem, 3.5vw, 2.2rem);
+  font-weight: 900;
+  padding: 4px 16px;
+  border-radius: 50px;
+  color: white;
+  min-width: 64px;
+  text-align: center;
+}
+.blue .team-score { background: var(--blue); }
+.red .team-score { background: var(--red); }
+
+.question-box {
+  background: white;
+  border-radius: var(--radius);
+  padding: 12px 8px;
+  text-align: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.question-text {
+  font-size: clamp(1.8rem, 4.5vw, 3rem);
+  font-weight: 900;
+  line-height: 1.2;
+  letter-spacing: .02em;
+}
+.blue .question-text { color: var(--blue-dark); }
+.red .question-text { color: var(--red-dark); }
+
+.question-box.correct { background: var(--green-light); }
+.question-box.wrong { background: var(--red-light); animation: shake .3s; }
+
+.answer-display {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+  font-size: clamp(1.6rem, 4vw, 2.5rem);
+  font-weight: 900;
+  letter-spacing: .1em;
+  min-height: 60px;
+  border: 3px solid #e2e8f0;
+  flex-shrink: 0;
+  transition: border-color .2s;
+  color: var(--text);
+}
+.blue .answer-display:not(:empty) { border-color: var(--blue); }
+.red .answer-display:not(:empty) { border-color: var(--red); }
+.answer-display.empty { color: var(--muted); }
+
+/* ===== NUMPAD ===== */
+.numpad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  flex: 1;
+}
+
+.numpad-btn {
+  border-radius: 14px;
+  border: none;
+  font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform .1s, box-shadow .1s;
+  box-shadow: 0 3px 0 rgba(0,0,0,0.15);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+}
+.numpad-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,0.15); }
+
+.blue .numpad-btn.digit { background: white; color: var(--blue-dark); }
+.blue .numpad-btn.digit:hover { background: var(--blue-light); }
+.blue .numpad-btn.del { background: #fde68a; color: #92400e; }
+.blue .numpad-btn.confirm { background: var(--blue); color: white; font-size: clamp(1rem, 2vw, 1.4rem); }
+.blue .numpad-btn.confirm:hover { background: var(--blue-dark); }
+
+.red .numpad-btn.digit { background: white; color: var(--red-dark); }
+.red .numpad-btn.digit:hover { background: var(--red-light); }
+.red .numpad-btn.del { background: #fde68a; color: #92400e; }
+.red .numpad-btn.confirm { background: var(--red); color: white; font-size: clamp(1rem, 2vw, 1.4rem); }
+.red .numpad-btn.confirm:hover { background: var(--red-dark); }
+
+.numpad-btn.minus { background: #e0e7ff; color: #3730a3; }
+.blue .numpad-btn.minus:hover { background: #c7d2fe; }
+.red .numpad-btn.minus { background: #e0e7ff; color: #3730a3; }
+
+.feedback-msg {
+  text-align: center;
+  font-size: .95rem;
+  font-weight: 700;
+  min-height: 24px;
+  flex-shrink: 0;
+}
+.feedback-msg.correct { color: var(--green); }
+.feedback-msg.wrong { color: var(--red); }
+
+/* ===== ROPE ARENA ===== */
+.rope-arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #fef9c3 0%, #fef3c7 100%);
+  border-left: 2px solid #fde68a;
+  border-right: 2px solid #fde68a;
+  position: relative;
+  overflow: hidden;
+  gap: 8px;
+  padding: 8px 4px;
+}
+
+.arena-score-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0 8px;
+  flex-shrink: 0;
+}
+
+.arena-team-score {
+  font-size: 1.6rem;
+  font-weight: 900;
+  padding: 4px 12px;
+  border-radius: 50px;
+  color: white;
+  min-width: 48px;
+  text-align: center;
+}
+.arena-team-score.blue { background: var(--blue); }
+.arena-team-score.red { background: var(--red); }
+
+/* rope visual */
+.rope-track {
+  width: 100%;
+  position: relative;
+  height: 100px;
+  flex-shrink: 0;
+}
+
+.rope-line {
+  position: absolute;
+  top: 50%;
+  left: 0; right: 0;
+  height: 14px;
+  transform: translateY(-50%);
+  border-radius: 7px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--rope-color) 0px, var(--rope-color) 12px,
+    var(--rope-mid) 12px, var(--rope-mid) 20px
+  );
+  box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+}
+
+.rope-center-mark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 4px;
+  height: 56px;
+  background: var(--text);
+  border-radius: 2px;
+  z-index: 3;
+}
+.rope-center-mark::before {
+  content: '';
+  position: absolute;
+  top: -8px; left: 50%;
+  transform: translateX(-50%);
+  width: 20px; height: 8px;
+  background: var(--text);
+  border-radius: 4px;
+}
+
+.rope-knot {
+  position: absolute;
+  top: 50%;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+  background: radial-gradient(circle at 40% 40%, #a16207, var(--rope-color));
+  box-shadow: 0 3px 10px rgba(0,0,0,0.35);
+  transition: left var(--transition);
+}
+
+.rope-flag {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -130%);
+  font-size: 1.4rem;
+  z-index: 5;
+  transition: left var(--transition);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+/* goal lines */
+.goal-line {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 4px;
+  border-radius: 2px;
+  z-index: 2;
+}
+.goal-line.left { left: 20%; background: rgba(37,99,235,0.5); }
+.goal-line.right { right: 20%; background: rgba(220,38,38,0.5); }
+.goal-line::after {
+  content: '🚩';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+}
+
+/* characters */
+.characters-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0 8px;
+  flex-shrink: 0;
+}
+
+.team-char {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  transition: transform .2s;
+  user-select: none;
+  line-height: 1;
+}
+.team-char.pulling-left { transform: scaleX(-1) translateX(4px); }
+.team-char.pulling-right { transform: translateX(-4px); }
+
+.lead-indicator {
+  font-size: .85rem;
+  font-weight: 800;
+  text-align: center;
+  padding: 4px 12px;
+  border-radius: 50px;
+  color: white;
+  flex-shrink: 0;
+  transition: background .3s;
+  min-height: 28px;
+}
+.lead-indicator.blue-lead { background: var(--blue); }
+.lead-indicator.red-lead { background: var(--red); }
+.lead-indicator.tie { background: var(--muted); }
+
+/* progress track */
+.progress-track {
+  width: calc(100% - 16px);
+  height: 12px;
+  background: #e2e8f0;
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+  position: relative;
+}
+.progress-fill {
+  height: 100%;
+  position: absolute;
+  top: 0;
+  border-radius: 6px;
+  transition: left var(--transition), width var(--transition);
+}
+.progress-fill.blue { background: var(--blue); left: 0; }
+.progress-fill.red { background: var(--red); right: 0; }
+
+/* ===== RESULT SCREEN ===== */
+#result-screen {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: linear-gradient(135deg, #dbeafe 0%, #f0f4ff 50%, #fee2e2 100%);
+  overflow-y: auto;
+}
+
+.result-card {
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+  padding: 40px 32px;
+  text-align: center;
+  max-width: 520px;
+  width: 100%;
+}
+
+.result-emoji { font-size: 4rem; margin-bottom: 8px; }
+
+.result-title {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+.result-title.blue { color: var(--blue-dark); }
+.result-title.red { color: var(--red-dark); }
+.result-title.tie { color: var(--muted); }
+
+.result-subtitle { color: var(--muted); margin-bottom: 24px; }
+
+.result-scores {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.result-score-box {
+  padding: 16px 28px;
+  border-radius: var(--radius);
+  color: white;
+  font-weight: 900;
+}
+.result-score-box.blue { background: var(--blue); }
+.result-score-box.red { background: var(--red); }
+.result-score-box .rsb-name { font-size: .9rem; opacity: .85; }
+.result-score-box .rsb-score { font-size: 2.5rem; line-height: 1.1; }
+
+.result-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 28px;
+  font-size: .9rem;
+  color: var(--muted);
+  text-align: left;
+}
+.result-stats span { font-weight: 700; color: var(--text); }
+
+.result-btns {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.result-btn {
+  padding: 14px 28px;
+  border-radius: 50px;
+  border: none;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform .15s;
+}
+.result-btn:hover { transform: translateY(-2px); }
+.result-btn.primary { background: var(--blue); color: white; }
+.result-btn.secondary { background: #f1f5f9; color: var(--text); border: 2px solid #e2e8f0; }
+
+/* ===== ANIMATIONS ===== */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  60% { transform: translateX(6px); }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .5; }
+}
+@keyframes correctFlash {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+@keyframes confetti-fall {
+  0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(60px) rotate(360deg); opacity: 0; }
+}
+.correct-anim { animation: correctFlash .3s ease; }
+
+.confetti-piece {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 999;
+  animation: confetti-fall 0.8s ease-out forwards;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 700px) {
+  .game-body {
+    grid-template-columns: 1fr 80px 1fr;
+  }
+  .rope-arena {
+    padding: 4px 2px;
+  }
+  .arena-score-row { padding: 0 2px; }
+  .arena-team-score { font-size: 1.1rem; padding: 2px 6px; }
+  .rope-track { height: 70px; }
+  .characters-row { padding: 0 2px; }
+  .team-char { font-size: 1.4rem; }
+  .team-inputs { grid-template-columns: 1fr; }
+  .setup-row-2col { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .game-body {
+    grid-template-columns: 1fr 60px 1fr;
+  }
+  .lead-indicator { font-size: .7rem; padding: 2px 6px; }
+}
+
+/* ===== UTILITY ===== */
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- ===== SETUP SCREEN ===== -->
+<div id="setup-screen" class="screen active">
+  <h1 class="setup-title">🪢 MatekVerseny</h1>
+  <p class="setup-subtitle">Kötélhúzás fejszámolással – két csapat, egy kötél!</p>
+
+  <div class="setup-card">
+    <h2>🧮 Műveletek</h2>
+    <div class="toggle-group" id="ops-group">
+      <button class="toggle-btn active" data-op="add">➕ Összeadás</button>
+      <button class="toggle-btn active" data-op="sub">➖ Kivonás</button>
+      <button class="toggle-btn" data-op="mul">✖️ Szorzás</button>
+      <button class="toggle-btn" data-op="div">➗ Osztás</button>
+    </div>
+  </div>
+
+  <div class="setup-card">
+    <h2>⚡ Nehézségi szint</h2>
+    <div class="toggle-group" id="diff-group">
+      <button class="toggle-btn diff-easy active" data-diff="easy">🟢 Könnyű</button>
+      <button class="toggle-btn diff-medium" data-diff="medium">🟡 Közepes</button>
+      <button class="toggle-btn diff-hard" data-diff="hard">🔴 Nehéz</button>
+    </div>
+  </div>
+
+  <div class="setup-card">
+    <h2>👥 Csapatnevek</h2>
+    <div class="team-inputs">
+      <div>
+        <label class="setup-label blue-label">🔵 Bal csapat</label>
+        <input class="setup-input blue-input" id="name-blue" type="text" value="Kék csapat" maxlength="16">
+      </div>
+      <div>
+        <label class="setup-label red-label">🔴 Jobb csapat</label>
+        <input class="setup-input red-input" id="name-red" type="text" value="Piros csapat" maxlength="16">
+      </div>
+    </div>
+  </div>
+
+  <div class="setup-card">
+    <h2>⚙️ Játék beállítások</h2>
+    <div class="setup-row-2col">
+      <div>
+        <label class="setup-label">⏱ Időkorlát (másodperc)</label>
+        <input class="setup-input" id="time-limit" type="number" value="120" min="30" max="600" step="10">
+      </div>
+      <div>
+        <label class="setup-label">🏆 Győzelmi pont</label>
+        <input class="setup-input" id="win-score" type="number" value="10" min="3" max="50">
+      </div>
+    </div>
+  </div>
+
+  <button class="start-btn" id="start-btn">🚀 Játék indítása!</button>
+</div>
+
+<!-- ===== GAME SCREEN ===== -->
+<div id="game-screen" class="screen">
+  <header class="game-header">
+    <div class="game-title">🪢 MatekVerseny</div>
+    <div class="timer-display" id="timer-display">2:00</div>
+    <button class="header-btn" id="quit-btn">✕ Kilépés</button>
+  </header>
+
+  <div class="game-body">
+    <!-- BLUE TEAM -->
+    <div class="team-panel blue" id="panel-blue">
+      <div class="team-header">
+        <div class="team-name" id="blue-name">Kék csapat</div>
+        <div class="team-score" id="blue-score">0</div>
+      </div>
+      <div class="question-box" id="blue-qbox">
+        <div class="question-text" id="blue-question">–</div>
+      </div>
+      <div class="answer-display empty" id="blue-answer">_</div>
+      <div class="feedback-msg" id="blue-feedback"></div>
+      <div class="numpad" id="blue-numpad">
+        <button class="numpad-btn digit" data-val="7">7</button>
+        <button class="numpad-btn digit" data-val="8">8</button>
+        <button class="numpad-btn digit" data-val="9">9</button>
+        <button class="numpad-btn digit" data-val="4">4</button>
+        <button class="numpad-btn digit" data-val="5">5</button>
+        <button class="numpad-btn digit" data-val="6">6</button>
+        <button class="numpad-btn digit" data-val="1">1</button>
+        <button class="numpad-btn digit" data-val="2">2</button>
+        <button class="numpad-btn digit" data-val="3">3</button>
+        <button class="numpad-btn minus" data-val="-">−</button>
+        <button class="numpad-btn digit" data-val="0">0</button>
+        <button class="numpad-btn del" data-action="del">⌫</button>
+        <button class="numpad-btn confirm" data-action="confirm" style="grid-column: span 3;">✓ OK</button>
+      </div>
+    </div>
+
+    <!-- ROPE ARENA -->
+    <div class="rope-arena" id="rope-arena">
+      <div class="arena-score-row">
+        <div class="arena-team-score blue" id="arena-blue-score">0</div>
+        <div class="arena-team-score red" id="arena-red-score">0</div>
+      </div>
+
+      <div class="rope-track" id="rope-track">
+        <div class="goal-line left"></div>
+        <div class="goal-line right"></div>
+        <div class="rope-line"></div>
+        <div class="rope-center-mark"></div>
+        <div class="rope-knot" id="rope-knot"></div>
+        <div class="rope-flag" id="rope-flag">🎀</div>
+      </div>
+
+      <div class="characters-row">
+        <div class="team-char" id="char-blue">🧑‍🎓</div>
+        <div class="team-char" id="char-red">🧑‍🎓</div>
+      </div>
+
+      <div class="lead-indicator tie" id="lead-indicator">Egyenlő! 🤝</div>
+
+      <div class="progress-track">
+        <div class="progress-fill blue" id="progress-blue"></div>
+        <div class="progress-fill red" id="progress-red"></div>
+      </div>
+    </div>
+
+    <!-- RED TEAM -->
+    <div class="team-panel red" id="panel-red">
+      <div class="team-header">
+        <div class="team-name" id="red-name">Piros csapat</div>
+        <div class="team-score" id="red-score">0</div>
+      </div>
+      <div class="question-box" id="red-qbox">
+        <div class="question-text" id="red-question">–</div>
+      </div>
+      <div class="answer-display empty" id="red-answer">_</div>
+      <div class="feedback-msg" id="red-feedback"></div>
+      <div class="numpad" id="red-numpad">
+        <button class="numpad-btn digit" data-val="7">7</button>
+        <button class="numpad-btn digit" data-val="8">8</button>
+        <button class="numpad-btn digit" data-val="9">9</button>
+        <button class="numpad-btn digit" data-val="4">4</button>
+        <button class="numpad-btn digit" data-val="5">5</button>
+        <button class="numpad-btn digit" data-val="6">6</button>
+        <button class="numpad-btn digit" data-val="1">1</button>
+        <button class="numpad-btn digit" data-val="2">2</button>
+        <button class="numpad-btn digit" data-val="3">3</button>
+        <button class="numpad-btn minus" data-val="-">−</button>
+        <button class="numpad-btn digit" data-val="0">0</button>
+        <button class="numpad-btn del" data-action="del">⌫</button>
+        <button class="numpad-btn confirm" data-action="confirm" style="grid-column: span 3;">✓ OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== RESULT SCREEN ===== -->
+<div id="result-screen" class="screen">
+  <div class="result-card">
+    <div class="result-emoji" id="result-emoji">🏆</div>
+    <div class="result-title" id="result-title">Kék csapat nyert!</div>
+    <div class="result-subtitle" id="result-subtitle">Gratulálunk!</div>
+    <div class="result-scores">
+      <div class="result-score-box blue">
+        <div class="rsb-name" id="result-blue-name">Kék csapat</div>
+        <div class="rsb-score" id="result-blue-score">0</div>
+      </div>
+      <div class="result-score-box red">
+        <div class="rsb-name" id="result-red-name">Piros csapat</div>
+        <div class="rsb-score" id="result-red-score">0</div>
+      </div>
+    </div>
+    <div class="result-stats">
+      <div>✅ Helyes (kék): <span id="stat-blue-correct">0</span></div>
+      <div>✅ Helyes (piros): <span id="stat-red-correct">0</span></div>
+      <div>❌ Hibás (kék): <span id="stat-blue-wrong">0</span></div>
+      <div>❌ Hibás (piros): <span id="stat-red-wrong">0</span></div>
+    </div>
+    <div class="result-btns">
+      <button class="result-btn primary" id="play-again-btn">🔁 Újra!</button>
+      <button class="result-btn secondary" id="menu-btn">🏠 Főmenü</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =====================================================
+   QUESTION GENERATOR
+   ===================================================== */
+const QuestionGenerator = {
+  config: {
+    ops: ['add', 'sub'],
+    difficulty: 'easy'
+  },
+
+  configure(ops, difficulty) {
+    this.config.ops = ops;
+    this.config.difficulty = difficulty;
+  },
+
+  rand(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  },
+
+  generate() {
+    const op = this.config.ops[Math.floor(Math.random() * this.config.ops.length)];
+    return this[`_gen_${op}`]();
+  },
+
+  _gen_add() {
+    const d = this.config.difficulty;
+    let a, b;
+    if (d === 'easy') { a = this.rand(1, 10); b = this.rand(1, 10); }
+    else if (d === 'medium') { a = this.rand(1, 50); b = this.rand(1, 50); }
+    else { a = this.rand(10, 99); b = this.rand(10, 99); }
+    return { text: `${a} + ${b} = ?`, answer: a + b };
+  },
+
+  _gen_sub() {
+    const d = this.config.difficulty;
+    let a, b;
+    if (d === 'easy') {
+      a = this.rand(2, 10); b = this.rand(1, a); // no negative
+    } else if (d === 'medium') {
+      a = this.rand(10, 50); b = this.rand(1, a);
+    } else {
+      a = this.rand(20, 99); b = this.rand(1, a);
+    }
+    return { text: `${a} − ${b} = ?`, answer: a - b };
+  },
+
+  _gen_mul() {
+    const d = this.config.difficulty;
+    let a, b;
+    if (d === 'easy') { a = this.rand(1, 5); b = this.rand(1, 5); }
+    else if (d === 'medium') { a = this.rand(2, 9); b = this.rand(2, 9); }
+    else { a = this.rand(2, 12); b = this.rand(2, 12); }
+    return { text: `${a} × ${b} = ?`, answer: a * b };
+  },
+
+  _gen_div() {
+    const d = this.config.difficulty;
+    let b, res;
+    if (d === 'easy') { b = this.rand(1, 5); res = this.rand(1, 5); }
+    else if (d === 'medium') { b = this.rand(2, 9); res = this.rand(2, 9); }
+    else { b = this.rand(2, 12); res = this.rand(2, 12); }
+    const a = b * res;
+    return { text: `${a} ÷ ${b} = ?`, answer: res };
+  }
+};
+
+/* =====================================================
+   ROPE / ARENA
+   ===================================================== */
+const TugOfWarArena = {
+  winScore: 10,
+  knotPercent: 50, // 0 = full blue win, 100 = full red win
+
+  init(winScore) {
+    this.winScore = winScore;
+    this.knotPercent = 50;
+    this.render(0, 0);
+  },
+
+  update(blueScore, redScore) {
+    const diff = blueScore - redScore;
+    const maxDiff = this.winScore;
+    // map diff to percent: positive diff = blue winning = knot moves left
+    this.knotPercent = 50 - (diff / maxDiff) * 40;
+    this.knotPercent = Math.max(5, Math.min(95, this.knotPercent));
+    this.render(blueScore, redScore);
+    return this.checkWin(blueScore, redScore);
+  },
+
+  render(blueScore, redScore) {
+    const knot = document.getElementById('rope-knot');
+    const flag = document.getElementById('rope-flag');
+    const lead = document.getElementById('lead-indicator');
+    const progressBlue = document.getElementById('progress-blue');
+    const progressRed = document.getElementById('progress-red');
+    const arenaBlue = document.getElementById('arena-blue-score');
+    const arenaRed = document.getElementById('arena-red-score');
+    const charBlue = document.getElementById('char-blue');
+    const charRed = document.getElementById('char-red');
+
+    knot.style.left = this.knotPercent + '%';
+    flag.style.left = this.knotPercent + '%';
+
+    arenaBlue.textContent = blueScore;
+    arenaRed.textContent = redScore;
+
+    // progress bars
+    const total = blueScore + redScore || 1;
+    const blueW = (blueScore / total) * 100;
+    const redW = (redScore / total) * 100;
+    progressBlue.style.width = blueW + '%';
+    progressRed.style.width = redW + '%';
+    progressRed.style.left = 'auto';
+    progressRed.style.right = '0';
+
+    // lead indicator
+    const diff = blueScore - redScore;
+    lead.className = 'lead-indicator';
+    if (diff > 0) {
+      lead.classList.add('blue-lead');
+      lead.textContent = `🔵 Kék vezet +${diff}`;
+    } else if (diff < 0) {
+      lead.classList.add('red-lead');
+      lead.textContent = `🔴 Piros vezet +${Math.abs(diff)}`;
+    } else {
+      lead.classList.add('tie');
+      lead.textContent = 'Egyenlő! 🤝';
+    }
+
+    // characters lean
+    charBlue.className = 'team-char ' + (diff < 0 ? '' : 'pulling-right');
+    charRed.className = 'team-char ' + (diff > 0 ? '' : 'pulling-left');
+  },
+
+  checkWin(blueScore, redScore) {
+    if (blueScore >= this.winScore) return 'blue';
+    if (redScore >= this.winScore) return 'red';
+    if (this.knotPercent <= 5) return 'blue';
+    if (this.knotPercent >= 95) return 'red';
+    return null;
+  }
+};
+
+/* =====================================================
+   GAME CONTROLLER
+   ===================================================== */
+const GameController = {
+  state: {
+    running: false,
+    blueScore: 0, redScore: 0,
+    blueCorrect: 0, redCorrect: 0,
+    blueWrong: 0, redWrong: 0,
+    blueAnswer: '', redAnswer: '',
+    blueQuestion: null, redQuestion: null,
+    blueName: 'Kék csapat', redName: 'Piros csapat',
+    timeLeft: 120,
+    winScore: 10,
+    timer: null,
+    feedbackTimers: { blue: null, red: null }
+  },
+
+  init(settings) {
+    const s = this.state;
+    s.running = false;
+    s.blueScore = 0; s.redScore = 0;
+    s.blueCorrect = 0; s.redCorrect = 0;
+    s.blueWrong = 0; s.redWrong = 0;
+    s.blueAnswer = ''; s.redAnswer = '';
+    s.blueName = settings.blueName;
+    s.redName = settings.redName;
+    s.timeLeft = settings.timeLimit;
+    s.winScore = settings.winScore;
+    clearInterval(s.timer);
+
+    QuestionGenerator.configure(settings.ops, settings.difficulty);
+    TugOfWarArena.init(settings.winScore);
+
+    // update names in UI
+    document.getElementById('blue-name').textContent = s.blueName;
+    document.getElementById('red-name').textContent = s.redName;
+    document.getElementById('result-blue-name').textContent = s.blueName;
+    document.getElementById('result-red-name').textContent = s.redName;
+
+    this._newQuestion('blue');
+    this._newQuestion('red');
+    this._renderAnswers();
+    this._renderScores();
+    this._renderTimer();
+  },
+
+  start() {
+    this.state.running = true;
+    this.state.timer = setInterval(() => this._tick(), 1000);
+  },
+
+  _tick() {
+    const s = this.state;
+    s.timeLeft--;
+    this._renderTimer();
+    if (s.timeLeft <= 0) {
+      this._endGame('time');
+    }
+  },
+
+  _renderTimer() {
+    const t = this.state.timeLeft;
+    const m = Math.floor(t / 60);
+    const sec = String(t % 60).padStart(2, '0');
+    const el = document.getElementById('timer-display');
+    el.textContent = `${m}:${sec}`;
+    el.className = 'timer-display' + (t <= 10 ? ' urgent' : '');
+  },
+
+  _newQuestion(team) {
+    this.state[team + 'Question'] = QuestionGenerator.generate();
+    const el = document.getElementById(team === 'blue' ? 'blue-question' : 'red-question');
+    el.textContent = this.state[team + 'Question'].text;
+    const qbox = document.getElementById(team === 'blue' ? 'blue-qbox' : 'red-qbox');
+    qbox.className = 'question-box';
+  },
+
+  _renderAnswers() {
+    ['blue', 'red'].forEach(team => {
+      const el = document.getElementById(team + '-answer');
+      const val = this.state[team + 'Answer'];
+      el.textContent = val || '_';
+      el.className = 'answer-display' + (val ? '' : ' empty');
+    });
+  },
+
+  _renderScores() {
+    const s = this.state;
+    document.getElementById('blue-score').textContent = s.blueScore;
+    document.getElementById('red-score').textContent = s.redScore;
+  },
+
+  input(team, action) {
+    if (!this.state.running) return;
+    const s = this.state;
+    const answerKey = team + 'Answer';
+
+    if (action === 'del') {
+      s[answerKey] = s[answerKey].slice(0, -1);
+    } else if (action === 'confirm') {
+      this._submit(team);
+      return;
+    } else if (action === '-') {
+      // only allow minus as first char
+      if (s[answerKey] === '') s[answerKey] = '-';
+    } else {
+      if (s[answerKey].length < 4) s[answerKey] += action;
+    }
+    this._renderAnswers();
+  },
+
+  _submit(team) {
+    const s = this.state;
+    const answerKey = team + 'Answer';
+    const qKey = team + 'Question';
+    const raw = s[answerKey];
+    if (raw === '' || raw === '-') return;
+    const userAns = parseInt(raw, 10);
+    const correct = s[qKey].answer;
+    const isCorrect = userAns === correct;
+
+    const qbox = document.getElementById(team + '-qbox');
+    const fbEl = document.getElementById(team + '-feedback');
+    clearTimeout(s.feedbackTimers[team]);
+
+    if (isCorrect) {
+      s[team + 'Score']++;
+      s[team + 'Correct']++;
+      qbox.className = 'question-box correct correct-anim';
+      fbEl.className = 'feedback-msg correct';
+      fbEl.textContent = '✓ Helyes! 🎉';
+      this._confetti(team);
+      s[answerKey] = '';
+      this._renderAnswers();
+      this._renderScores();
+      const winner = TugOfWarArena.update(s.blueScore, s.redScore);
+      setTimeout(() => { this._newQuestion(team); }, 400);
+      if (winner) { setTimeout(() => this._endGame(winner), 600); return; }
+    } else {
+      s[team + 'Wrong']++;
+      qbox.className = 'question-box wrong';
+      fbEl.className = 'feedback-msg wrong';
+      fbEl.textContent = '✗ Próbáld újra!';
+      s[answerKey] = '';
+      this._renderAnswers();
+    }
+
+    s.feedbackTimers[team] = setTimeout(() => {
+      fbEl.textContent = '';
+      fbEl.className = 'feedback-msg';
+      if (!isCorrect) qbox.className = 'question-box';
+    }, 900);
+  },
+
+  _confetti(team) {
+    const panel = document.getElementById('panel-' + team);
+    const rect = panel.getBoundingClientRect();
+    const colors = team === 'blue'
+      ? ['#2563eb','#93c5fd','#1e40af','#bfdbfe','#fff']
+      : ['#dc2626','#fca5a5','#991b1b','#fee2e2','#fff'];
+    for (let i = 0; i < 12; i++) {
+      const el = document.createElement('div');
+      el.className = 'confetti-piece';
+      el.style.left = (rect.left + Math.random() * rect.width) + 'px';
+      el.style.top = (rect.top + Math.random() * 60) + 'px';
+      el.style.background = colors[Math.floor(Math.random() * colors.length)];
+      el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+      el.style.width = (6 + Math.random() * 8) + 'px';
+      el.style.height = (6 + Math.random() * 8) + 'px';
+      el.style.animationDelay = (Math.random() * 0.3) + 's';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 1100);
+    }
+  },
+
+  _endGame(reason) {
+    const s = this.state;
+    if (!s.running && reason !== 'time') return;
+    s.running = false;
+    clearInterval(s.timer);
+
+    let winner = reason;
+    if (reason === 'time') {
+      if (s.blueScore > s.redScore) winner = 'blue';
+      else if (s.redScore > s.blueScore) winner = 'red';
+      else winner = 'tie';
+    }
+
+    document.getElementById('result-blue-score').textContent = s.blueScore;
+    document.getElementById('result-red-score').textContent = s.redScore;
+    document.getElementById('stat-blue-correct').textContent = s.blueCorrect;
+    document.getElementById('stat-red-correct').textContent = s.redCorrect;
+    document.getElementById('stat-blue-wrong').textContent = s.blueWrong;
+    document.getElementById('stat-red-wrong').textContent = s.redWrong;
+
+    const titleEl = document.getElementById('result-title');
+    const emojiEl = document.getElementById('result-emoji');
+    const subtitleEl = document.getElementById('result-subtitle');
+
+    if (winner === 'blue') {
+      emojiEl.textContent = '🏆';
+      titleEl.textContent = s.blueName + ' nyert!';
+      titleEl.className = 'result-title blue';
+      subtitleEl.textContent = 'Szuper munka, kék csapat! 🎉';
+    } else if (winner === 'red') {
+      emojiEl.textContent = '🏆';
+      titleEl.textContent = s.redName + ' nyert!';
+      titleEl.className = 'result-title red';
+      subtitleEl.textContent = 'Szuper munka, piros csapat! 🎉';
+    } else {
+      emojiEl.textContent = '🤝';
+      titleEl.textContent = 'Döntetlen!';
+      titleEl.className = 'result-title tie';
+      subtitleEl.textContent = 'Mindkét csapat nagyszerűen teljesített!';
+    }
+
+    showScreen('result-screen');
+  }
+};
+
+/* =====================================================
+   KEYBOARD INPUT
+   ===================================================== */
+const keyMap = {
+  '0':'0','1':'1','2':'2','3':'3','4':'4',
+  '5':'5','6':'6','7':'7','8':'8','9':'9',
+  'Backspace': 'del', 'Enter': 'confirm'
+};
+// Blue team: normal numpad/keyboard (left side), Red: numpad on right
+// We'll let keyboard work for both teams with separate key sets
+const blueKeys = {
+  '1':'1','2':'2','3':'3','4':'4','5':'5',
+  '6':'6','7':'7','8':'8','9':'9','0':'0',
+  'Backspace':'del','Enter':'confirm','-':'-'
+};
+
+document.addEventListener('keydown', e => {
+  // No keyboard focus - handled via dedicated virtual numpad
+  // But allow keyboard as additional input:
+  if (!GameController.state.running) return;
+  // We don't know which team pressed - skip keyboard global handler
+  // (both teams use on-screen numpad; physical keyboard not primary)
+});
+
+/* =====================================================
+   UI SETUP & SCREEN MANAGEMENT
+   ===================================================== */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// Setup toggles: operations (multi-select, at least 1)
+document.querySelectorAll('#ops-group .toggle-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const active = document.querySelectorAll('#ops-group .toggle-btn.active');
+    if (btn.classList.contains('active') && active.length <= 1) return; // keep at least 1
+    btn.classList.toggle('active');
+  });
+});
+
+// Setup toggles: difficulty (single-select)
+document.querySelectorAll('#diff-group .toggle-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#diff-group .toggle-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+// Start button
+document.getElementById('start-btn').addEventListener('click', () => {
+  const ops = [...document.querySelectorAll('#ops-group .toggle-btn.active')].map(b => b.dataset.op);
+  const diff = document.querySelector('#diff-group .toggle-btn.active').dataset.diff;
+  const blueName = document.getElementById('name-blue').value.trim() || 'Kék csapat';
+  const redName = document.getElementById('name-red').value.trim() || 'Piros csapat';
+  const timeLimit = parseInt(document.getElementById('time-limit').value) || 120;
+  const winScore = parseInt(document.getElementById('win-score').value) || 10;
+
+  GameController.init({ ops, difficulty: diff, blueName, redName, timeLimit, winScore });
+  showScreen('game-screen');
+  setTimeout(() => GameController.start(), 100);
+});
+
+// Numpad listeners
+function setupNumpad(teamId, panelId) {
+  document.getElementById(panelId).querySelectorAll('.numpad-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.dataset.val) GameController.input(teamId, btn.dataset.val);
+      else if (btn.dataset.action) GameController.input(teamId, btn.dataset.action);
+    });
+    // Touch: prevent double-fire
+    btn.addEventListener('touchend', e => {
+      e.preventDefault();
+      if (btn.dataset.val) GameController.input(teamId, btn.dataset.val);
+      else if (btn.dataset.action) GameController.input(teamId, btn.dataset.action);
+    });
+  });
+}
+setupNumpad('blue', 'panel-blue');
+setupNumpad('red', 'panel-red');
+
+// Quit
+document.getElementById('quit-btn').addEventListener('click', () => {
+  if (confirm('Biztosan kilépsz a játékból?')) {
+    clearInterval(GameController.state.timer);
+    GameController.state.running = false;
+    showScreen('setup-screen');
+  }
+});
+
+// Result buttons
+document.getElementById('play-again-btn').addEventListener('click', () => {
+  const s = GameController.state;
+  GameController.init({
+    ops: QuestionGenerator.config.ops,
+    difficulty: QuestionGenerator.config.difficulty,
+    blueName: s.blueName,
+    redName: s.redName,
+    timeLimit: s.winScore * 12, // approximate
+    winScore: s.winScore
+  });
+  showScreen('game-screen');
+  setTimeout(() => GameController.start(), 100);
+});
+
+document.getElementById('menu-btn').addEventListener('click', () => {
+  clearInterval(GameController.state.timer);
+  GameController.state.running = false;
+  showScreen('setup-screen');
+});
+</script>
+</body>
+</html>
