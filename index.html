@@ -34,7 +34,7 @@ html, body {
   color: var(--text);
   overflow: hidden;
 }
-body { display: flex; flex-direction: column; height: 100vh; }
+body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
 
 /* ===== SCREENS ===== */
 .screen { display: none; width: 100%; height: 100%; }
@@ -96,9 +96,9 @@ body { display: flex; flex-direction: column; height: 100vh; }
 }
 .toggle-btn:hover { border-color: var(--blue); }
 .toggle-btn.active { background: var(--blue); color: white; border-color: var(--blue); }
-.toggle-btn.diff-easy.active { background: var(--green); border-color: var(--green); }
+.toggle-btn.diff-easy.active   { background: var(--green);  border-color: var(--green); }
 .toggle-btn.diff-medium.active { background: var(--yellow); border-color: var(--yellow); color: #1e293b; }
-.toggle-btn.diff-hard.active { background: var(--red); border-color: var(--red); }
+.toggle-btn.diff-hard.active   { background: var(--red);    border-color: var(--red); }
 
 .setup-input {
   width: 100%;
@@ -116,7 +116,7 @@ body { display: flex; flex-direction: column; height: 100vh; }
 .team-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .setup-label { font-size: .95rem; font-weight: 600; margin-bottom: 6px; display: block; color: var(--muted); }
 .blue-label { color: #60a5fa !important; }
-.red-label { color: #f87171 !important; }
+.red-label  { color: #f87171 !important; }
 .setup-row-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
 .start-btn {
@@ -140,52 +140,69 @@ body { display: flex; flex-direction: column; height: 100vh; }
 .start-btn:active { transform: translateY(0); }
 
 /* ===== GAME SCREEN ===== */
-#game-screen { flex-direction: column; height: 100vh; overflow: hidden; background: var(--bg); }
+#game-screen {
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--bg);
+}
 
 .game-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 16px;
+  padding: 6px 16px;
   background: rgba(30,41,59,0.95);
   border-bottom: 1px solid rgba(255,255,255,0.08);
   flex-shrink: 0;
   z-index: 10;
+  /* fixed height so it never grows */
+  height: 44px;
 }
 .game-title {
   font-weight: 900;
-  font-size: 1.1rem;
+  font-size: 1rem;
   background: linear-gradient(90deg, #60a5fa, #f87171);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  white-space: nowrap;
 }
 .timer-display {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 900;
   color: var(--text);
   font-variant-numeric: tabular-nums;
-  min-width: 60px;
+  min-width: 56px;
   text-align: center;
 }
 .timer-display.urgent { color: #f87171; animation: pulse 1s infinite; }
 .header-btn {
-  padding: 6px 14px;
+  padding: 5px 12px;
   border-radius: 50px;
   border: 1px solid rgba(255,255,255,0.15);
   background: transparent;
   color: var(--muted);
-  font-size: .85rem;
+  font-size: .8rem;
   font-weight: 700;
   cursor: pointer;
   transition: all .2s;
+  white-space: nowrap;
 }
 .header-btn:hover { border-color: var(--red); color: #f87171; }
 
+/* ===== GAME BODY =====
+   PC:     1fr 260px 1fr
+   Tablet landscape: same (260px middle is fine)
+   Narrow: 1fr 70px 1fr
+*/
 .game-body {
   display: grid;
   grid-template-columns: 1fr 260px 1fr;
+  /* fill exactly the remaining height */
   flex: 1;
+  min-height: 0;       /* critical: allows children to shrink below content size */
   overflow: hidden;
 }
 
@@ -193,26 +210,29 @@ body { display: flex; flex-direction: column; height: 100vh; }
 .team-panel {
   display: flex;
   flex-direction: column;
-  padding: 10px;
-  gap: 7px;
-  overflow: hidden;
+  /* padding tighter on small screens via clamp */
+  padding: clamp(6px, 1.2vh, 12px);
+  gap: clamp(4px, 0.8vh, 8px);
+  overflow: hidden;    /* never overflow the panel */
+  min-height: 0;
 }
 .team-panel.blue { background: linear-gradient(180deg, #0f1e3d 0%, #1e3a6e 100%); border-right: 2px solid rgba(37,99,235,0.3); }
 .team-panel.red  { background: linear-gradient(180deg, #2d0a0a 0%, #5c1a1a 100%); border-left:  2px solid rgba(220,38,38,0.3); }
 
 .team-header { display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-.team-name { font-size: clamp(.95rem, 2.2vw, 1.3rem); font-weight: 900; }
+.team-name { font-size: clamp(.85rem, 2vw, 1.3rem); font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .blue .team-name { color: #60a5fa; }
 .red  .team-name { color: #f87171; }
 
 .team-score {
-  font-size: clamp(1.3rem, 3vw, 2rem);
+  font-size: clamp(1.1rem, 2.5vh, 2rem);
   font-weight: 900;
-  padding: 3px 14px;
+  padding: 2px 12px;
   border-radius: 50px;
   color: white;
-  min-width: 56px;
+  min-width: 48px;
   text-align: center;
+  flex-shrink: 0;
 }
 .blue .team-score { background: var(--blue); }
 .red  .team-score { background: var(--red); }
@@ -221,7 +241,7 @@ body { display: flex; flex-direction: column; height: 100vh; }
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.10);
   border-radius: var(--radius);
-  padding: 10px 8px;
+  padding: clamp(6px, 1.2vh, 12px) 8px;
   text-align: center;
   flex-shrink: 0;
   position: relative;
@@ -229,45 +249,57 @@ body { display: flex; flex-direction: column; height: 100vh; }
   transition: background .2s, border-color .2s;
 }
 .question-text {
-  font-size: clamp(1.6rem, 4vw, 2.8rem);
+  /* key: clamp against vh so it shrinks on short screens */
+  font-size: clamp(1.3rem, 4.5vh, 2.8rem);
   font-weight: 900;
-  line-height: 1.2;
+  line-height: 1.1;
 }
 .blue .question-text { color: #93c5fd; }
 .red  .question-text { color: #fca5a5; }
-.question-box.correct { background: rgba(22,163,74,0.2); border-color: rgba(22,163,74,0.5); }
+.question-box.correct { background: rgba(22,163,74,0.2);  border-color: rgba(22,163,74,0.5); }
 .question-box.wrong   { background: rgba(220,38,38,0.2); border-color: rgba(220,38,38,0.5); animation: shake .3s; }
 
 .answer-display {
   background: rgba(255,255,255,0.06);
   border: 2px solid rgba(255,255,255,0.12);
   border-radius: 12px;
-  padding: 10px;
+  padding: clamp(6px, 1.2vh, 10px);
   text-align: center;
-  font-size: clamp(1.5rem, 3.5vw, 2.3rem);
+  font-size: clamp(1.2rem, 3.5vh, 2.3rem);
   font-weight: 900;
-  letter-spacing: .1em;
-  min-height: 56px;
+  letter-spacing: .08em;
+  min-height: 0;         /* shrinkable */
   flex-shrink: 0;
   transition: border-color .2s;
   color: var(--text);
+  /* guarantee at least one line of text height */
+  line-height: 1.2;
 }
 .blue .answer-display.has-value { border-color: var(--blue); }
 .red  .answer-display.has-value { border-color: var(--red); }
 .answer-display.empty { color: var(--muted); }
 
-/* ===== NUMPAD ===== */
-/* Layout: 1 2 3 / 4 5 6 / 7 8 9 / CLR 0 OK */
+/* ===== NUMPAD =====
+   Layout: 1 2 3 / 4 5 6 / 7 8 9 / CLR 0 OK
+   The numpad takes all remaining flex space, buttons divide it equally.
+   min-height:0 on the numpad + aspect-ratio on buttons prevents overflow.
+*/
 .numpad {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 7px;
-  flex: 1;
+  /* 4 rows */
+  grid-template-rows: repeat(4, 1fr);
+  gap: clamp(4px, 0.8vh, 8px);
+  flex: 1;          /* fills remaining panel space */
+  min-height: 0;    /* allow shrink */
+  overflow: hidden;
 }
+
 .numpad-btn {
   border-radius: 13px;
   border: none;
-  font-size: clamp(1.1rem, 2.2vw, 1.7rem);
+  /* font scales with the button, not with vw/vh directly */
+  font-size: clamp(.9rem, 2.2vh, 1.7rem);
   font-weight: 800;
   cursor: pointer;
   transition: transform .1s, filter .1s;
@@ -277,8 +309,11 @@ body { display: flex; flex-direction: column; height: 100vh; }
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 50px;
+  /* NO min-height here – let the grid row decide the height */
+  width: 100%;
+  height: 100%;
   color: white;
+  overflow: hidden;
 }
 .numpad-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,0.4); }
 
@@ -288,15 +323,16 @@ body { display: flex; flex-direction: column; height: 100vh; }
 .numpad-btn.clr:hover { filter: brightness(1.2); }
 .blue .numpad-btn.confirm { background: linear-gradient(135deg, var(--blue), #1d4ed8); }
 .red  .numpad-btn.confirm { background: linear-gradient(135deg, var(--red),  #b91c1c); }
-.numpad-btn.confirm { font-size: clamp(.9rem, 1.8vw, 1.3rem); }
+.numpad-btn.confirm { font-size: clamp(.85rem, 1.8vh, 1.3rem); }
 .numpad-btn.confirm:hover { filter: brightness(1.15); }
 
 .feedback-msg {
   text-align: center;
-  font-size: .9rem;
+  font-size: clamp(.75rem, 1.5vh, .9rem);
   font-weight: 700;
-  min-height: 22px;
+  min-height: 0;
   flex-shrink: 0;
+  line-height: 1.4;
 }
 .feedback-msg.correct { color: #4ade80; }
 .feedback-msg.wrong   { color: #f87171; }
@@ -311,15 +347,15 @@ body { display: flex; flex-direction: column; height: 100vh; }
   border-right: 1px solid rgba(255,255,255,0.07);
   position: relative;
   overflow: hidden;
-  padding: 8px 6px 6px;
-  gap: 6px;
+  padding: 6px 4px 4px;
+  gap: 4px;
+  min-height: 0;
 }
 
-/* stars background */
+/* stars */
 .rocket-arena::before {
   content: '';
-  position: absolute;
-  inset: 0;
+  position: absolute; inset: 0;
   background-image:
     radial-gradient(1px 1px at 15% 12%, rgba(255,255,255,.7) 0%, transparent 100%),
     radial-gradient(1px 1px at 72% 8%,  rgba(255,255,255,.5) 0%, transparent 100%),
@@ -335,7 +371,6 @@ body { display: flex; flex-direction: column; height: 100vh; }
   z-index: 0;
 }
 
-/* score row at top */
 .arena-score-row {
   display: flex;
   justify-content: space-between;
@@ -345,22 +380,21 @@ body { display: flex; flex-direction: column; height: 100vh; }
   position: relative;
 }
 .arena-team-score {
-  font-size: 1.4rem;
+  font-size: clamp(.9rem, 2vh, 1.4rem);
   font-weight: 900;
-  padding: 3px 12px;
+  padding: 2px 8px;
   border-radius: 50px;
   color: white;
-  min-width: 44px;
+  min-width: 36px;
   text-align: center;
 }
 .arena-team-score.blue { background: var(--blue); }
 .arena-team-score.red  { background: var(--red); }
 
-/* lead pill */
 .lead-pill {
-  font-size: .72rem;
+  font-size: clamp(.6rem, 1.2vh, .72rem);
   font-weight: 800;
-  padding: 3px 8px;
+  padding: 2px 6px;
   border-radius: 50px;
   color: white;
   text-align: center;
@@ -377,7 +411,7 @@ body { display: flex; flex-direction: column; height: 100vh; }
   flex: 1;
   display: flex;
   align-items: stretch;
-  gap: 8px;
+  gap: 6px;
   z-index: 1;
   position: relative;
   min-height: 0;
@@ -389,16 +423,16 @@ body { display: flex; flex-direction: column; height: 100vh; }
   flex-direction: column;
   align-items: center;
   position: relative;
-  border-radius: 12px;
+  border-radius: 10px;
   overflow: visible;
-  padding: 0 4px;
+  padding: 0 2px;
+  min-height: 0;
 }
 
-/* track tube */
 .lane-tube {
   flex: 1;
-  width: 28px;
-  border-radius: 14px;
+  width: 24px;
+  border-radius: 12px;
   position: relative;
   overflow: hidden;
   min-height: 0;
@@ -406,22 +440,18 @@ body { display: flex; flex-direction: column; height: 100vh; }
 .lane.blue .lane-tube { background: linear-gradient(180deg, rgba(37,99,235,0.15) 0%, rgba(37,99,235,0.05) 100%); border: 1px solid rgba(37,99,235,0.3); }
 .lane.red  .lane-tube { background: linear-gradient(180deg, rgba(220,38,38,0.15) 0%, rgba(220,38,38,0.05) 100%); border: 1px solid rgba(220,38,38,0.3); }
 
-/* fill bar inside tube */
 .lane-fill {
   position: absolute;
-  bottom: 0;
-  left: 0; right: 0;
-  border-radius: 14px;
+  bottom: 0; left: 0; right: 0;
+  border-radius: 12px;
   transition: height var(--transition);
 }
 .lane.blue .lane-fill { background: linear-gradient(0deg, #1d4ed8, #60a5fa); box-shadow: 0 0 12px rgba(37,99,235,0.6); }
 .lane.red  .lane-fill { background: linear-gradient(0deg, #b91c1c, #f87171); box-shadow: 0 0 12px rgba(220,38,38,0.6); }
 
-/* goal line at top of tube */
 .goal-line {
   position: absolute;
-  top: 6%;
-  left: -6px; right: -6px;
+  top: 6%; left: -4px; right: -4px;
   height: 2px;
   border-radius: 1px;
   z-index: 3;
@@ -431,31 +461,27 @@ body { display: flex; flex-direction: column; height: 100vh; }
 .goal-line::after {
   content: '🏁';
   position: absolute;
-  top: -12px;
-  left: 50%;
+  top: -11px; left: 50%;
   transform: translateX(-50%);
-  font-size: .9rem;
+  font-size: .8rem;
   line-height: 1;
 }
 
-/* rocket icon */
 .rocket-icon {
   position: absolute;
   left: 50%;
   transform: translateX(-50%) translateY(50%);
-  font-size: 1.6rem;
+  font-size: clamp(1rem, 2.5vh, 1.6rem);
   line-height: 1;
   transition: bottom var(--transition);
   z-index: 4;
   filter: drop-shadow(0 0 8px rgba(255,200,0,0.9));
 }
-
-/* flame particles */
 .rocket-flame {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  font-size: .8rem;
+  font-size: .7rem;
   z-index: 3;
   opacity: 0;
   transition: bottom var(--transition), opacity .1s;
@@ -463,44 +489,20 @@ body { display: flex; flex-direction: column; height: 100vh; }
 }
 .rocket-flame.active { opacity: 1; animation: flicker .2s infinite alternate; }
 
-/* score dots on tube */
-.score-dots {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 0;
-  width: 6px;
-  display: flex;
-  flex-direction: column-reverse;
-  gap: 3px;
-  z-index: 5;
-  pointer-events: none;
-}
-.score-dot {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.5);
-  flex-shrink: 0;
-}
-
-/* launch pad at bottom */
 .launchpad {
   width: 100%;
   text-align: center;
-  font-size: .7rem;
+  font-size: clamp(.55rem, 1.2vh, .7rem);
   font-weight: 700;
   color: var(--muted);
   flex-shrink: 0;
-  padding: 2px 0;
+  padding: 1px 0;
 }
 
-/* orbit line between lanes */
 .orbit-line {
   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 1px;
-  top: 0; bottom: 0;
+  left: 50%; transform: translateX(-50%);
+  width: 1px; top: 0; bottom: 0;
   background: linear-gradient(180deg, transparent, rgba(255,255,255,0.08) 30%, rgba(255,255,255,0.08) 70%, transparent);
   z-index: 0;
 }
@@ -538,13 +540,9 @@ body { display: flex; flex-direction: column; height: 100vh; }
 .result-score-box .rsb-name  { font-size: .9rem; opacity: .85; }
 .result-score-box .rsb-score { font-size: 2.5rem; line-height: 1.1; }
 .result-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-bottom: 28px;
-  font-size: .9rem;
-  color: var(--muted);
-  text-align: left;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px; margin-bottom: 28px;
+  font-size: .9rem; color: var(--muted); text-align: left;
 }
 .result-stats span { font-weight: 700; color: var(--text); }
 .result-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
@@ -554,58 +552,47 @@ body { display: flex; flex-direction: column; height: 100vh; }
 .result-btn.secondary { background: rgba(255,255,255,0.08); color: var(--text); border: 1px solid rgba(255,255,255,0.15); }
 
 /* ===== ANIMATIONS ===== */
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  20%       { transform: translateX(-6px); }
-  60%       { transform: translateX(6px); }
-}
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: .5; }
-}
-@keyframes correctFlash {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
-@keyframes confetti-fall {
-  0%   { transform: translateY(-10px) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(80px)  rotate(360deg); opacity: 0; }
-}
-@keyframes flicker {
-  0%   { transform: translateX(-50%) scale(1);    opacity: .8; }
-  100% { transform: translateX(-50%) scale(1.15); opacity: 1; }
-}
-@keyframes rocket-boost {
-  0%   { filter: drop-shadow(0 0 8px rgba(255,200,0,0.9)); }
-  50%  { filter: drop-shadow(0 0 20px rgba(255,200,0,1)) drop-shadow(0 0 30px rgba(255,120,0,0.8)); }
-  100% { filter: drop-shadow(0 0 8px rgba(255,200,0,0.9)); }
-}
+@keyframes shake   { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 60%{transform:translateX(6px)} }
+@keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:.5} }
+@keyframes correctFlash { 0%{transform:scale(1)} 50%{transform:scale(1.05)} 100%{transform:scale(1)} }
+@keyframes confetti-fall { 0%{transform:translateY(-10px) rotate(0deg);opacity:1} 100%{transform:translateY(80px) rotate(360deg);opacity:0} }
+@keyframes flicker { 0%{transform:translateX(-50%) scale(1);opacity:.8} 100%{transform:translateX(-50%) scale(1.15);opacity:1} }
+@keyframes rocket-boost { 0%{filter:drop-shadow(0 0 8px rgba(255,200,0,0.9))} 50%{filter:drop-shadow(0 0 20px rgba(255,200,0,1)) drop-shadow(0 0 30px rgba(255,120,0,0.8))} 100%{filter:drop-shadow(0 0 8px rgba(255,200,0,0.9))} }
 .rocket-boost-anim { animation: rocket-boost .5s ease; }
 .correct-anim { animation: correctFlash .3s ease; }
 
 .confetti-piece {
-  position: fixed;
-  width: 10px; height: 10px;
-  border-radius: 2px;
-  pointer-events: none;
-  z-index: 999;
+  position: fixed; width: 10px; height: 10px; border-radius: 2px;
+  pointer-events: none; z-index: 999;
   animation: confetti-fall 0.9s ease-out forwards;
 }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 700px) {
-  .game-body { grid-template-columns: 1fr 70px 1fr; }
-  .rocket-arena { padding: 4px 2px 4px; }
+/* ===== RESPONSIVE =====
+   IMPORTANT: only touch layout tweaks below.
+   Desktop (>= 1024px) is untouched.
+*/
+
+/* Tablet landscape & smaller desktop: shrink middle column a bit */
+@media (max-width: 900px) {
+  .game-body { grid-template-columns: 1fr 180px 1fr; }
   .lane-tube { width: 20px; }
-  .rocket-icon { font-size: 1.2rem; }
-  .arena-team-score { font-size: 1rem; padding: 2px 6px; }
+  .rocket-icon { font-size: clamp(.9rem, 2.2vh, 1.3rem); }
+}
+
+/* Tablet portrait & large phone landscape */
+@media (max-width: 700px) {
+  .game-body { grid-template-columns: 1fr 80px 1fr; }
+  .lane-tube { width: 16px; }
+  .rocket-icon { font-size: 1rem; }
+  .arena-team-score { font-size: .85rem; padding: 1px 5px; min-width: 28px; }
   .team-inputs { grid-template-columns: 1fr; }
   .setup-row-2col { grid-template-columns: 1fr; }
 }
-@media (max-width: 480px) {
-  .game-body { grid-template-columns: 1fr 54px 1fr; }
-  .lead-pill { font-size: .65rem; }
+
+/* Small phones */
+@media (max-width: 400px) {
+  .game-body { grid-template-columns: 1fr 56px 1fr; }
+  .lane-tube { width: 14px; }
 }
 
 .hidden { display: none !important; }
@@ -688,7 +675,6 @@ body { display: flex; flex-direction: column; height: 100vh; }
       </div>
       <div class="answer-display empty" id="blue-answer">_</div>
       <div class="feedback-msg" id="blue-feedback"></div>
-      <!-- Numpad: 1 2 3 / 4 5 6 / 7 8 9 / CLR 0 OK -->
       <div class="numpad" id="blue-numpad">
         <button class="numpad-btn digit" data-val="1">1</button>
         <button class="numpad-btn digit" data-val="2">2</button>
@@ -716,7 +702,6 @@ body { display: flex; flex-direction: column; height: 100vh; }
       <div class="race-track" id="race-track">
         <div class="orbit-line"></div>
 
-        <!-- BLUE LANE -->
         <div class="lane blue" id="lane-blue">
           <div class="lane-tube" id="tube-blue">
             <div class="goal-line"></div>
@@ -727,7 +712,6 @@ body { display: flex; flex-direction: column; height: 100vh; }
           <div class="launchpad">🔵 Kék</div>
         </div>
 
-        <!-- RED LANE -->
         <div class="lane red" id="lane-red">
           <div class="lane-tube" id="tube-red">
             <div class="goal-line"></div>
@@ -751,7 +735,6 @@ body { display: flex; flex-direction: column; height: 100vh; }
       </div>
       <div class="answer-display empty" id="red-answer">_</div>
       <div class="feedback-msg" id="red-feedback"></div>
-      <!-- Numpad: 1 2 3 / 4 5 6 / 7 8 9 / CLR 0 OK -->
       <div class="numpad" id="red-numpad">
         <button class="numpad-btn digit" data-val="1">1</button>
         <button class="numpad-btn digit" data-val="2">2</button>
@@ -805,35 +788,28 @@ body { display: flex; flex-direction: column; height: 100vh; }
    ===================================================== */
 const QuestionGenerator = {
   config: { ops: ['add','sub'], difficulty: 'easy' },
-
   configure(ops, difficulty) { this.config.ops = ops; this.config.difficulty = difficulty; },
-
   rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; },
-
   generate() {
     const op = this.config.ops[Math.floor(Math.random() * this.config.ops.length)];
     return this['_gen_' + op]();
   },
-
   _gen_add() {
     const d = this.config.difficulty;
     let a, b;
-    if (d==='easy')   { a=this.rand(1,10);  b=this.rand(1,10); }
+    if (d==='easy')        { a=this.rand(1,10);  b=this.rand(1,10); }
     else if (d==='medium') { a=this.rand(1,50);  b=this.rand(1,50); }
-    else              { a=this.rand(10,99); b=this.rand(10,99); }
+    else                   { a=this.rand(10,99); b=this.rand(10,99); }
     return { text: `${a} + ${b} = ?`, answer: a+b };
   },
-
   _gen_sub() {
     const d = this.config.difficulty;
     let a, b;
-    // Always ensure a >= b so result >= 0
     if (d==='easy')        { a=this.rand(2,10);  b=this.rand(1,a); }
     else if (d==='medium') { a=this.rand(10,50); b=this.rand(1,a); }
     else                   { a=this.rand(20,99); b=this.rand(1,a); }
     return { text: `${a} − ${b} = ?`, answer: a-b };
   },
-
   _gen_mul() {
     const d = this.config.difficulty;
     let a, b;
@@ -842,7 +818,6 @@ const QuestionGenerator = {
     else                   { a=this.rand(2,12); b=this.rand(2,12); }
     return { text: `${a} × ${b} = ?`, answer: a*b };
   },
-
   _gen_div() {
     const d = this.config.difficulty;
     let b, res;
@@ -858,58 +833,37 @@ const QuestionGenerator = {
    ===================================================== */
 const RocketArena = {
   winScore: 10,
-
-  init(winScore) {
-    this.winScore = winScore;
-    this.render(0, 0);
-  },
-
-  update(blueScore, redScore) {
-    this.render(blueScore, redScore);
-    return this.checkWin(blueScore, redScore);
-  },
-
+  init(winScore) { this.winScore = winScore; this.render(0, 0); },
+  update(blueScore, redScore) { this.render(blueScore, redScore); return this.checkWin(blueScore, redScore); },
   render(blueScore, redScore) {
     const ws = this.winScore;
-    const bluePct = Math.min((blueScore / ws) * 94, 94); // max 94% = just below goal line (top 6%)
+    const bluePct = Math.min((blueScore / ws) * 94, 94);
     const redPct  = Math.min((redScore  / ws) * 94, 94);
-
-    // fill bars
-    document.getElementById('fill-blue').style.height = bluePct + '%';
-    document.getElementById('fill-red').style.height  = redPct  + '%';
-
-    // rockets sit on top of their fill
+    document.getElementById('fill-blue').style.height   = bluePct + '%';
+    document.getElementById('fill-red').style.height    = redPct  + '%';
     document.getElementById('rocket-blue').style.bottom = bluePct + '%';
     document.getElementById('rocket-red').style.bottom  = redPct  + '%';
     document.getElementById('flame-blue').style.bottom  = (bluePct - 6) + '%';
     document.getElementById('flame-red').style.bottom   = (redPct  - 6) + '%';
-
-    // score badges
     document.getElementById('arena-blue-score').textContent = blueScore;
     document.getElementById('arena-red-score').textContent  = redScore;
-
-    // lead pill
     const lead = document.getElementById('lead-pill');
     const diff = blueScore - redScore;
     lead.className = 'lead-pill';
-    if (diff > 0)      { lead.classList.add('blue-lead'); lead.textContent = `🔵 +${diff}`; }
+    if      (diff > 0) { lead.classList.add('blue-lead'); lead.textContent = `🔵 +${diff}`; }
     else if (diff < 0) { lead.classList.add('red-lead');  lead.textContent = `🔴 +${Math.abs(diff)}`; }
     else               { lead.classList.add('tie');        lead.textContent = '🤝'; }
   },
-
   boostRocket(team) {
     const r = document.getElementById('rocket-' + team);
-    const f = document.getElementById('flame-' + team);
-    r.classList.remove('rocket-boost-anim');
-    void r.offsetWidth;
-    r.classList.add('rocket-boost-anim');
+    const f = document.getElementById('flame-'  + team);
+    r.classList.remove('rocket-boost-anim'); void r.offsetWidth; r.classList.add('rocket-boost-anim');
     f.classList.add('active');
     setTimeout(() => { f.classList.remove('active'); r.classList.remove('rocket-boost-anim'); }, 600);
   },
-
-  checkWin(blueScore, redScore) {
-    if (blueScore >= this.winScore) return 'blue';
-    if (redScore  >= this.winScore) return 'red';
+  checkWin(b, r) {
+    if (b >= this.winScore) return 'blue';
+    if (r >= this.winScore) return 'red';
     return null;
   }
 };
@@ -919,203 +873,150 @@ const RocketArena = {
    ===================================================== */
 const GameController = {
   state: {
-    running: false,
-    blueScore: 0, redScore: 0,
-    blueCorrect: 0, redCorrect: 0,
-    blueWrong: 0,  redWrong: 0,
-    blueAnswer: '', redAnswer: '',
-    blueQuestion: null, redQuestion: null,
-    blueName: 'Kék csapat', redName: 'Piros csapat',
-    timeLeft: 120, winScore: 10,
-    timer: null,
-    feedbackTimers: { blue: null, red: null }
+    running:false,
+    blueScore:0, redScore:0,
+    blueCorrect:0, redCorrect:0,
+    blueWrong:0,  redWrong:0,
+    blueAnswer:'', redAnswer:'',
+    blueQuestion:null, redQuestion:null,
+    blueName:'Kék csapat', redName:'Piros csapat',
+    timeLeft:120, winScore:10,
+    timer:null,
+    feedbackTimers:{blue:null,red:null}
   },
 
   init(settings) {
     const s = this.state;
     Object.assign(s, {
-      running: false,
-      blueScore:0, redScore:0,
-      blueCorrect:0, redCorrect:0,
-      blueWrong:0,  redWrong:0,
-      blueAnswer:'', redAnswer:'',
-      blueName: settings.blueName,
-      redName:  settings.redName,
-      timeLeft: settings.timeLimit,
-      winScore: settings.winScore
+      running:false,
+      blueScore:0,redScore:0,blueCorrect:0,redCorrect:0,blueWrong:0,redWrong:0,
+      blueAnswer:'',redAnswer:'',
+      blueName:settings.blueName, redName:settings.redName,
+      timeLeft:settings.timeLimit, winScore:settings.winScore
     });
     clearInterval(s.timer);
-
     QuestionGenerator.configure(settings.ops, settings.difficulty);
     RocketArena.init(settings.winScore);
-
     document.getElementById('blue-name').textContent = s.blueName;
     document.getElementById('red-name').textContent  = s.redName;
     document.getElementById('result-blue-name').textContent = s.blueName;
     document.getElementById('result-red-name').textContent  = s.redName;
-
-    this._newQuestion('blue');
-    this._newQuestion('red');
-    this._renderAnswers();
-    this._renderScores();
-    this._renderTimer();
+    this._newQuestion('blue'); this._newQuestion('red');
+    this._renderAnswers(); this._renderScores(); this._renderTimer();
   },
 
-  start() {
-    this.state.running = true;
-    this.state.timer = setInterval(() => this._tick(), 1000);
-  },
+  start() { this.state.running=true; this.state.timer=setInterval(()=>this._tick(),1000); },
 
   _tick() {
-    const s = this.state;
-    s.timeLeft--;
+    this.state.timeLeft--;
     this._renderTimer();
-    if (s.timeLeft <= 0) this._endGame('time');
+    if (this.state.timeLeft<=0) this._endGame('time');
   },
 
   _renderTimer() {
-    const t = this.state.timeLeft;
-    const el = document.getElementById('timer-display');
-    el.textContent = `${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`;
-    el.className = 'timer-display' + (t <= 10 ? ' urgent' : '');
+    const t=this.state.timeLeft;
+    const el=document.getElementById('timer-display');
+    el.textContent=`${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`;
+    el.className='timer-display'+(t<=10?' urgent':'');
   },
 
   _newQuestion(team) {
-    this.state[team+'Question'] = QuestionGenerator.generate();
-    document.getElementById(team+'-question').textContent = this.state[team+'Question'].text;
-    document.getElementById(team+'-qbox').className = 'question-box';
+    this.state[team+'Question']=QuestionGenerator.generate();
+    document.getElementById(team+'-question').textContent=this.state[team+'Question'].text;
+    document.getElementById(team+'-qbox').className='question-box';
   },
 
   _renderAnswers() {
-    ['blue','red'].forEach(t => {
-      const el  = document.getElementById(t+'-answer');
-      const val = this.state[t+'Answer'];
-      el.textContent = val || '_';
-      el.className = 'answer-display' + (val ? ' has-value' : ' empty');
+    ['blue','red'].forEach(t=>{
+      const el=document.getElementById(t+'-answer');
+      const val=this.state[t+'Answer'];
+      el.textContent=val||'_';
+      el.className='answer-display'+(val?' has-value':' empty');
     });
   },
 
   _renderScores() {
-    const s = this.state;
-    document.getElementById('blue-score').textContent = s.blueScore;
-    document.getElementById('red-score').textContent  = s.redScore;
+    document.getElementById('blue-score').textContent=this.state.blueScore;
+    document.getElementById('red-score').textContent =this.state.redScore;
   },
 
-  input(team, action) {
+  input(team,action) {
     if (!this.state.running) return;
-    const s = this.state;
-    const key = team + 'Answer';
-    if (action === 'clr')     { s[key] = ''; }
-    else if (action === 'confirm') { this._submit(team); return; }
-    else { if (s[key].length < 4) s[key] += action; }
+    const key=team+'Answer';
+    if      (action==='clr')     this.state[key]='';
+    else if (action==='confirm') { this._submit(team); return; }
+    else { if (this.state[key].length<4) this.state[key]+=action; }
     this._renderAnswers();
   },
 
   _submit(team) {
-    const s   = this.state;
-    const key = team + 'Answer';
-    const raw = s[key];
+    const s=this.state, key=team+'Answer', raw=s[key];
     if (!raw) return;
-    const userAns = parseInt(raw, 10);
-    const correct = s[team+'Question'].answer;
-    const isOk    = userAns === correct;
-
-    const qbox = document.getElementById(team+'-qbox');
-    const fbEl = document.getElementById(team+'-feedback');
+    const userAns=parseInt(raw,10), correct=s[team+'Question'].answer, isOk=userAns===correct;
+    const qbox=document.getElementById(team+'-qbox'), fbEl=document.getElementById(team+'-feedback');
     clearTimeout(s.feedbackTimers[team]);
-
     if (isOk) {
-      s[team+'Score']++;
-      s[team+'Correct']++;
-      qbox.className = 'question-box correct correct-anim';
-      fbEl.className = 'feedback-msg correct';
-      fbEl.textContent = '✓ Helyes! 🎉';
-      s[key] = '';
-      this._renderAnswers();
-      this._renderScores();
+      s[team+'Score']++; s[team+'Correct']++;
+      qbox.className='question-box correct correct-anim';
+      fbEl.className='feedback-msg correct'; fbEl.textContent='✓ Helyes! 🎉';
+      s[key]=''; this._renderAnswers(); this._renderScores();
       RocketArena.boostRocket(team);
-      const winner = RocketArena.update(s.blueScore, s.redScore);
+      const winner=RocketArena.update(s.blueScore,s.redScore);
       this._confetti(team);
-      setTimeout(() => this._newQuestion(team), 400);
-      if (winner) { setTimeout(() => this._endGame(winner), 700); return; }
+      setTimeout(()=>this._newQuestion(team),400);
+      if (winner) { setTimeout(()=>this._endGame(winner),700); return; }
     } else {
       s[team+'Wrong']++;
-      qbox.className = 'question-box wrong';
-      fbEl.className = 'feedback-msg wrong';
-      fbEl.textContent = '✗ Próbáld újra!';
-      s[key] = '';
-      this._renderAnswers();
+      qbox.className='question-box wrong';
+      fbEl.className='feedback-msg wrong'; fbEl.textContent='✗ Próbáld újra!';
+      s[key]=''; this._renderAnswers();
     }
-
-    s.feedbackTimers[team] = setTimeout(() => {
-      fbEl.textContent = '';
-      fbEl.className = 'feedback-msg';
-      if (!isOk) qbox.className = 'question-box';
-    }, 900);
+    s.feedbackTimers[team]=setTimeout(()=>{
+      fbEl.textContent=''; fbEl.className='feedback-msg';
+      if (!isOk) qbox.className='question-box';
+    },900);
   },
 
   _confetti(team) {
-    const panel  = document.getElementById('panel-' + team);
-    const rect   = panel.getBoundingClientRect();
-    const colors = team === 'blue'
-      ? ['#2563eb','#93c5fd','#1e40af','#bfdbfe','#e0e7ff']
-      : ['#dc2626','#fca5a5','#991b1b','#fee2e2','#ffd6d6'];
-    for (let i = 0; i < 14; i++) {
-      const el = document.createElement('div');
-      el.className = 'confetti-piece';
-      el.style.cssText = `
-        left: ${rect.left + Math.random()*rect.width}px;
-        top:  ${rect.top  + Math.random()*60}px;
-        background: ${colors[Math.floor(Math.random()*colors.length)]};
-        border-radius: ${Math.random()>.5?'50%':'3px'};
-        width:  ${6+Math.random()*8}px;
-        height: ${6+Math.random()*8}px;
-        animation-delay: ${Math.random()*.3}s;
-      `;
+    const panel=document.getElementById('panel-'+team);
+    const rect=panel.getBoundingClientRect();
+    const colors=team==='blue'
+      ?['#2563eb','#93c5fd','#1e40af','#bfdbfe','#e0e7ff']
+      :['#dc2626','#fca5a5','#991b1b','#fee2e2','#ffd6d6'];
+    for (let i=0;i<14;i++) {
+      const el=document.createElement('div');
+      el.className='confetti-piece';
+      el.style.cssText=`left:${rect.left+Math.random()*rect.width}px;top:${rect.top+Math.random()*60}px;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${Math.random()>.5?'50%':'3px'};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;animation-delay:${Math.random()*.3}s;`;
       document.body.appendChild(el);
-      setTimeout(() => el.remove(), 1200);
+      setTimeout(()=>el.remove(),1200);
     }
   },
 
   _endGame(reason) {
-    const s = this.state;
-    if (!s.running && reason !== 'time') return;
-    s.running = false;
-    clearInterval(s.timer);
-
-    let winner = reason;
-    if (reason === 'time') {
-      if      (s.blueScore > s.redScore) winner = 'blue';
-      else if (s.redScore > s.blueScore) winner = 'red';
-      else winner = 'tie';
+    const s=this.state;
+    if (!s.running && reason!=='time') return;
+    s.running=false; clearInterval(s.timer);
+    let winner=reason;
+    if (reason==='time') {
+      if      (s.blueScore>s.redScore) winner='blue';
+      else if (s.redScore>s.blueScore) winner='red';
+      else winner='tie';
     }
-
-    document.getElementById('result-blue-score').textContent = s.blueScore;
-    document.getElementById('result-red-score').textContent  = s.redScore;
-    document.getElementById('stat-blue-correct').textContent = s.blueCorrect;
-    document.getElementById('stat-red-correct').textContent  = s.redCorrect;
-    document.getElementById('stat-blue-wrong').textContent   = s.blueWrong;
-    document.getElementById('stat-red-wrong').textContent    = s.redWrong;
-
-    const titleEl    = document.getElementById('result-title');
-    const emojiEl    = document.getElementById('result-emoji');
-    const subtitleEl = document.getElementById('result-subtitle');
-
-    if (winner === 'blue') {
-      emojiEl.textContent    = '🏆';
-      titleEl.textContent   = s.blueName + ' nyert!';
-      titleEl.className     = 'result-title blue';
-      subtitleEl.textContent = 'Szuper repkélés, kék csapat! 🚀';
-    } else if (winner === 'red') {
-      emojiEl.textContent    = '🏆';
-      titleEl.textContent   = s.redName + ' nyert!';
-      titleEl.className     = 'result-title red';
-      subtitleEl.textContent = 'Szuper repkélés, piros csapat! 🚀';
+    document.getElementById('result-blue-score').textContent=s.blueScore;
+    document.getElementById('result-red-score').textContent =s.redScore;
+    document.getElementById('stat-blue-correct').textContent=s.blueCorrect;
+    document.getElementById('stat-red-correct').textContent =s.redCorrect;
+    document.getElementById('stat-blue-wrong').textContent  =s.blueWrong;
+    document.getElementById('stat-red-wrong').textContent   =s.redWrong;
+    const titleEl=document.getElementById('result-title');
+    const emojiEl=document.getElementById('result-emoji');
+    const subtitleEl=document.getElementById('result-subtitle');
+    if (winner==='blue') {
+      emojiEl.textContent='🏆'; titleEl.textContent=s.blueName+' nyert!'; titleEl.className='result-title blue'; subtitleEl.textContent='Szuper repülés, kék csapat! 🚀';
+    } else if (winner==='red') {
+      emojiEl.textContent='🏆'; titleEl.textContent=s.redName+' nyert!';  titleEl.className='result-title red';  subtitleEl.textContent='Szuper repülés, piros csapat! 🚀';
     } else {
-      emojiEl.textContent    = '🤝';
-      titleEl.textContent   = 'Döntetlen!';
-      titleEl.className     = 'result-title tie';
-      subtitleEl.textContent = 'Mindkét rakéta egyszerre ért célt!';
+      emojiEl.textContent='🤝'; titleEl.textContent='Döntetlen!'; titleEl.className='result-title tie'; subtitleEl.textContent='Mindkét rakéta egyszerre ért célt!';
     }
     showScreen('result-screen');
   }
@@ -1125,79 +1026,71 @@ const GameController = {
    UI & EVENT BINDINGS
    ===================================================== */
 function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
-// Ops toggles (multi, min 1)
-document.querySelectorAll('#ops-group .toggle-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const active = document.querySelectorAll('#ops-group .toggle-btn.active');
-    if (btn.classList.contains('active') && active.length <= 1) return;
+document.querySelectorAll('#ops-group .toggle-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const active=document.querySelectorAll('#ops-group .toggle-btn.active');
+    if (btn.classList.contains('active')&&active.length<=1) return;
     btn.classList.toggle('active');
   });
 });
 
-// Difficulty toggles (single)
-document.querySelectorAll('#diff-group .toggle-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('#diff-group .toggle-btn').forEach(b => b.classList.remove('active'));
+document.querySelectorAll('#diff-group .toggle-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('#diff-group .toggle-btn').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
   });
 });
 
-// Start
-document.getElementById('start-btn').addEventListener('click', () => {
-  const ops      = [...document.querySelectorAll('#ops-group .toggle-btn.active')].map(b => b.dataset.op);
-  const diff     = document.querySelector('#diff-group .toggle-btn.active').dataset.diff;
-  const blueName = document.getElementById('name-blue').value.trim()  || 'Kék csapat';
-  const redName  = document.getElementById('name-red').value.trim()   || 'Piros csapat';
-  const timeLimit = parseInt(document.getElementById('time-limit').value) || 120;
-  const winScore  = parseInt(document.getElementById('win-score').value)  || 10;
-  GameController.init({ ops, difficulty: diff, blueName, redName, timeLimit, winScore });
+document.getElementById('start-btn').addEventListener('click',()=>{
+  const ops=     [...document.querySelectorAll('#ops-group .toggle-btn.active')].map(b=>b.dataset.op);
+  const diff=    document.querySelector('#diff-group .toggle-btn.active').dataset.diff;
+  const blueName=document.getElementById('name-blue').value.trim()  ||'Kék csapat';
+  const redName= document.getElementById('name-red').value.trim()   ||'Piros csapat';
+  const timeLimit=parseInt(document.getElementById('time-limit').value)||120;
+  const winScore= parseInt(document.getElementById('win-score').value) ||10;
+  GameController.init({ops,difficulty:diff,blueName,redName,timeLimit,winScore});
   showScreen('game-screen');
-  setTimeout(() => GameController.start(), 100);
+  setTimeout(()=>GameController.start(),100);
 });
 
-// Numpad
-function setupNumpad(teamId, panelId) {
-  document.getElementById(panelId).querySelectorAll('.numpad-btn').forEach(btn => {
-    const fire = () => {
-      if (btn.dataset.val)    GameController.input(teamId, btn.dataset.val);
-      if (btn.dataset.action) GameController.input(teamId, btn.dataset.action);
+function setupNumpad(teamId,panelId) {
+  document.getElementById(panelId).querySelectorAll('.numpad-btn').forEach(btn=>{
+    const fire=()=>{
+      if (btn.dataset.val)    GameController.input(teamId,btn.dataset.val);
+      if (btn.dataset.action) GameController.input(teamId,btn.dataset.action);
     };
-    btn.addEventListener('click', fire);
-    btn.addEventListener('touchend', e => { e.preventDefault(); fire(); });
+    btn.addEventListener('click',fire);
+    btn.addEventListener('touchend',e=>{e.preventDefault();fire();});
   });
 }
-setupNumpad('blue', 'panel-blue');
-setupNumpad('red',  'panel-red');
+setupNumpad('blue','panel-blue');
+setupNumpad('red', 'panel-red');
 
-// Quit
-document.getElementById('quit-btn').addEventListener('click', () => {
+document.getElementById('quit-btn').addEventListener('click',()=>{
   if (confirm('Biztosan kilépsz?')) {
     clearInterval(GameController.state.timer);
-    GameController.state.running = false;
+    GameController.state.running=false;
     showScreen('setup-screen');
   }
 });
 
-// Result buttons
-document.getElementById('play-again-btn').addEventListener('click', () => {
-  const s = GameController.state;
+document.getElementById('play-again-btn').addEventListener('click',()=>{
+  const s=GameController.state;
   GameController.init({
-    ops: QuestionGenerator.config.ops,
-    difficulty: QuestionGenerator.config.difficulty,
-    blueName: s.blueName, redName: s.redName,
-    timeLimit: s.winScore * 12,
-    winScore: s.winScore
+    ops:QuestionGenerator.config.ops, difficulty:QuestionGenerator.config.difficulty,
+    blueName:s.blueName, redName:s.redName,
+    timeLimit:s.winScore*12, winScore:s.winScore
   });
   showScreen('game-screen');
-  setTimeout(() => GameController.start(), 100);
+  setTimeout(()=>GameController.start(),100);
 });
-document.getElementById('menu-btn').addEventListener('click', () => {
+document.getElementById('menu-btn').addEventListener('click',()=>{
   clearInterval(GameController.state.timer);
-  GameController.state.running = false;
+  GameController.state.running=false;
   showScreen('setup-screen');
 });
 </script>
