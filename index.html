@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="hu">
+<html lang="de">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>MatekVerseny – Rakétaverseny</title>
+<title>MatheWettbewerb – Raketenrennen</title>
 <style>
 /* ===== RESET & BASE ===== */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -602,72 +602,72 @@ body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
 
 <!-- ===== SETUP SCREEN ===== -->
 <div id="setup-screen" class="screen active">
-  <h1 class="setup-title">🚀 MatekVerseny</h1>
-  <p class="setup-subtitle">Rakétaverseny fejszámolással – két csapat, egy pálya!</p>
+  <h1 class="setup-title">🚀 MatheWettbewerb</h1>
+  <p class="setup-subtitle">Raketenrennen mit Kopfrechnen – zwei Teams, eine Strecke!</p>
 
   <div class="setup-card">
-    <h2>🧮 Műveletek</h2>
+    <h2>🧮 Rechenarten</h2>
     <div class="toggle-group" id="ops-group">
-      <button class="toggle-btn active" data-op="add">➕ Összeadás</button>
-      <button class="toggle-btn active" data-op="sub">➖ Kivonás</button>
-      <button class="toggle-btn" data-op="mul">✖️ Szorzás</button>
-      <button class="toggle-btn" data-op="div">➗ Osztás</button>
+      <button class="toggle-btn active" data-op="add">➕ Addition</button>
+      <button class="toggle-btn active" data-op="sub">➖ Subtraktion</button>
+      <button class="toggle-btn" data-op="mul">✖️ Multiplikation</button>
+      <button class="toggle-btn" data-op="div">➗ Division</button>
     </div>
   </div>
 
   <div class="setup-card">
-    <h2>⚡ Nehézségi szint</h2>
+    <h2>⚡ Schwierigkeitsgrad</h2>
     <div class="toggle-group" id="diff-group">
-      <button class="toggle-btn diff-easy active" data-diff="easy">🟢 Könnyű</button>
-      <button class="toggle-btn diff-medium" data-diff="medium">🟡 Közepes</button>
-      <button class="toggle-btn diff-hard" data-diff="hard">🔴 Nehéz</button>
+      <button class="toggle-btn diff-easy active" data-diff="easy">🟢 Leicht</button>
+      <button class="toggle-btn diff-medium" data-diff="medium">🟡 Mittel</button>
+      <button class="toggle-btn diff-hard" data-diff="hard">🔴 Schwer</button>
     </div>
   </div>
 
   <div class="setup-card">
-    <h2>👥 Csapatnevek</h2>
+    <h2>👥 Teamnamen</h2>
     <div class="team-inputs">
       <div>
-        <label class="setup-label blue-label">🔵 Bal csapat</label>
-        <input class="setup-input" id="name-blue" type="text" value="Kék csapat" maxlength="16">
+        <label class="setup-label blue-label">🔵 Linkes Team</label>
+        <input class="setup-input" id="name-blue" type="text" value="Blaues Team" maxlength="16">
       </div>
       <div>
-        <label class="setup-label red-label">🔴 Jobb csapat</label>
-        <input class="setup-input" id="name-red" type="text" value="Piros csapat" maxlength="16">
+        <label class="setup-label red-label">🔴 Rechtes Team</label>
+        <input class="setup-input" id="name-red" type="text" value="Rotes Team" maxlength="16">
       </div>
     </div>
   </div>
 
   <div class="setup-card">
-    <h2>⚙️ Játék beállítások</h2>
+    <h2>⚙️ Spieleinstellungen</h2>
     <div class="setup-row-2col">
       <div>
-        <label class="setup-label">⏱ Időkorlát (másodperc)</label>
+        <label class="setup-label">⏱ Zeitlimit (Sekunden)</label>
         <input class="setup-input" id="time-limit" type="number" value="120" min="30" max="600" step="10">
       </div>
       <div>
-        <label class="setup-label">🏆 Győzelmi pont</label>
+        <label class="setup-label">🏆 Siegpunktzahl</label>
         <input class="setup-input" id="win-score" type="number" value="10" min="3" max="30">
       </div>
     </div>
   </div>
 
-  <button class="start-btn" id="start-btn">🚀 Indítás!</button>
+  <button class="start-btn" id="start-btn">🚀 Start!</button>
 </div>
 
 <!-- ===== GAME SCREEN ===== -->
 <div id="game-screen" class="screen">
   <header class="game-header">
-    <div class="game-title">🚀 MatekVerseny</div>
+    <div class="game-title">🚀 MatheWettbewerb</div>
     <div class="timer-display" id="timer-display">2:00</div>
-    <button class="header-btn" id="quit-btn">✕ Kilépés</button>
+    <button class="header-btn" id="quit-btn">✕ Beenden</button>
   </header>
 
   <div class="game-body">
     <!-- BLUE TEAM -->
     <div class="team-panel blue" id="panel-blue">
       <div class="team-header">
-        <div class="team-name" id="blue-name">Kék csapat</div>
+        <div class="team-name" id="blue-name">Blaues Team</div>
         <div class="team-score" id="blue-score">0</div>
       </div>
       <div class="question-box" id="blue-qbox">
@@ -709,7 +709,7 @@ body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
             <div class="rocket-icon" id="rocket-blue" style="bottom:0%">🚀</div>
             <div class="rocket-flame" id="flame-blue" style="bottom:0%">🔥</div>
           </div>
-          <div class="launchpad">🔵 Kék</div>
+          <div class="launchpad">🔵 Blau</div>
         </div>
 
         <div class="lane red" id="lane-red">
@@ -719,7 +719,7 @@ body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
             <div class="rocket-icon" id="rocket-red" style="bottom:0%">🚀</div>
             <div class="rocket-flame" id="flame-red" style="bottom:0%">🔥</div>
           </div>
-          <div class="launchpad">🔴 Piros</div>
+          <div class="launchpad">🔴 Rot</div>
         </div>
       </div>
     </div>
@@ -727,7 +727,7 @@ body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
     <!-- RED TEAM -->
     <div class="team-panel red" id="panel-red">
       <div class="team-header">
-        <div class="team-name" id="red-name">Piros csapat</div>
+        <div class="team-name" id="red-name">Rotes Team</div>
         <div class="team-score" id="red-score">0</div>
       </div>
       <div class="question-box" id="red-qbox">
@@ -757,27 +757,27 @@ body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
 <div id="result-screen" class="screen">
   <div class="result-card">
     <div class="result-emoji" id="result-emoji">🏆</div>
-    <div class="result-title" id="result-title">Kék csapat nyert!</div>
-    <div class="result-subtitle" id="result-subtitle">Gratulálunk!</div>
+    <div class="result-title" id="result-title">Blaues Team hat gewonnen!</div>
+    <div class="result-subtitle" id="result-subtitle">Herzlichen Glückwunsch!</div>
     <div class="result-scores">
       <div class="result-score-box blue">
-        <div class="rsb-name" id="result-blue-name">Kék csapat</div>
+        <div class="rsb-name" id="result-blue-name">Blaues Team</div>
         <div class="rsb-score" id="result-blue-score">0</div>
       </div>
       <div class="result-score-box red">
-        <div class="rsb-name" id="result-red-name">Piros csapat</div>
+        <div class="rsb-name" id="result-red-name">Rotes Team</div>
         <div class="rsb-score" id="result-red-score">0</div>
       </div>
     </div>
     <div class="result-stats">
-      <div>✅ Helyes (kék): <span id="stat-blue-correct">0</span></div>
-      <div>✅ Helyes (piros): <span id="stat-red-correct">0</span></div>
-      <div>❌ Hibás (kék): <span id="stat-blue-wrong">0</span></div>
-      <div>❌ Hibás (piros): <span id="stat-red-wrong">0</span></div>
+      <div>✅ Richtig (blau): <span id="stat-blue-correct">0</span></div>
+      <div>✅ Richtig (rot): <span id="stat-red-correct">0</span></div>
+      <div>❌ Falsch (blau): <span id="stat-blue-wrong">0</span></div>
+      <div>❌ Falsch (rot): <span id="stat-red-wrong">0</span></div>
     </div>
     <div class="result-btns">
-      <button class="result-btn primary"   id="play-again-btn">🔁 Újra!</button>
-      <button class="result-btn secondary" id="menu-btn">🏠 Főmenü</button>
+      <button class="result-btn primary"   id="play-again-btn">🔁 Nochmal!</button>
+      <button class="result-btn secondary" id="menu-btn">🏠 Hauptmenü</button>
     </div>
   </div>
 </div>
@@ -879,7 +879,7 @@ const GameController = {
     blueWrong:0,  redWrong:0,
     blueAnswer:'', redAnswer:'',
     blueQuestion:null, redQuestion:null,
-    blueName:'Kék csapat', redName:'Piros csapat',
+    blueName:'Blaues Team', redName:'Rotes Team',
     timeLeft:120, winScore:10,
     timer:null,
     feedbackTimers:{blue:null,red:null}
@@ -958,7 +958,7 @@ const GameController = {
     if (isOk) {
       s[team+'Score']++; s[team+'Correct']++;
       qbox.className='question-box correct correct-anim';
-      fbEl.className='feedback-msg correct'; fbEl.textContent='✓ Helyes! 🎉';
+      fbEl.className='feedback-msg correct'; fbEl.textContent='✓ Richtig! 🎉';
       s[key]=''; this._renderAnswers(); this._renderScores();
       RocketArena.boostRocket(team);
       const winner=RocketArena.update(s.blueScore,s.redScore);
@@ -968,7 +968,7 @@ const GameController = {
     } else {
       s[team+'Wrong']++;
       qbox.className='question-box wrong';
-      fbEl.className='feedback-msg wrong'; fbEl.textContent='✗ Próbáld újra!';
+      fbEl.className='feedback-msg wrong'; fbEl.textContent='✗ Versuch es erneut!';
       s[key]=''; this._renderAnswers();
     }
     s.feedbackTimers[team]=setTimeout(()=>{
@@ -1012,11 +1012,11 @@ const GameController = {
     const emojiEl=document.getElementById('result-emoji');
     const subtitleEl=document.getElementById('result-subtitle');
     if (winner==='blue') {
-      emojiEl.textContent='🏆'; titleEl.textContent=s.blueName+' nyert!'; titleEl.className='result-title blue'; subtitleEl.textContent='Szuper repülés, kék csapat! 🚀';
+      emojiEl.textContent='🏆'; titleEl.textContent=s.blueName+' hat gewonnen!'; titleEl.className='result-title blue'; subtitleEl.textContent='Super Flug, blaues Team! 🚀';
     } else if (winner==='red') {
-      emojiEl.textContent='🏆'; titleEl.textContent=s.redName+' nyert!';  titleEl.className='result-title red';  subtitleEl.textContent='Szuper repülés, piros csapat! 🚀';
+      emojiEl.textContent='🏆'; titleEl.textContent=s.redName+' hat gewonnen!';  titleEl.className='result-title red';  subtitleEl.textContent='Super Flug, rotes Team! 🚀';
     } else {
-      emojiEl.textContent='🤝'; titleEl.textContent='Döntetlen!'; titleEl.className='result-title tie'; subtitleEl.textContent='Mindkét rakéta egyszerre ért célt!';
+      emojiEl.textContent='🤝'; titleEl.textContent='Unentschieden!'; titleEl.className='result-title tie'; subtitleEl.textContent='Beide Raketen haben gleichzeitig das Ziel erreicht!';
     }
     showScreen('result-screen');
   }
@@ -1048,8 +1048,8 @@ document.querySelectorAll('#diff-group .toggle-btn').forEach(btn=>{
 document.getElementById('start-btn').addEventListener('click',()=>{
   const ops=     [...document.querySelectorAll('#ops-group .toggle-btn.active')].map(b=>b.dataset.op);
   const diff=    document.querySelector('#diff-group .toggle-btn.active').dataset.diff;
-  const blueName=document.getElementById('name-blue').value.trim()  ||'Kék csapat';
-  const redName= document.getElementById('name-red').value.trim()   ||'Piros csapat';
+  const blueName=document.getElementById('name-blue').value.trim()  ||'Blaues Team';
+  const redName= document.getElementById('name-red').value.trim()   ||'Rotes Team';
   const timeLimit=parseInt(document.getElementById('time-limit').value)||120;
   const winScore= parseInt(document.getElementById('win-score').value) ||10;
   GameController.init({ops,difficulty:diff,blueName,redName,timeLimit,winScore});
@@ -1071,7 +1071,7 @@ setupNumpad('blue','panel-blue');
 setupNumpad('red', 'panel-red');
 
 document.getElementById('quit-btn').addEventListener('click',()=>{
-  if (confirm('Biztosan kilépsz?')) {
+  if (confirm('Möchtest du wirklich beenden?')) {
     clearInterval(GameController.state.timer);
     GameController.state.running=false;
     showScreen('setup-screen');
