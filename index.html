@@ -119,6 +119,72 @@ body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
 .red-label  { color: #f87171 !important; }
 .setup-row-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
+/* ===== MISSING MODE TOGGLE ===== */
+/*
+ * Egyetlen új UI-elem: egy iOS-stílusú kapcsoló (toggle switch).
+ * Csak ez az egy blokk az új CSS – minden más érintetlen.
+ */
+.missing-mode-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  user-select: none;
+}
+.missing-mode-row input[type="checkbox"] {
+  /* Elrejtjük a natív checkboxot, a saját toggle veszi át a szerepét */
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.missing-mode-switch {
+  position: relative;
+  width: 52px;
+  height: 28px;
+  background: rgba(255,255,255,0.12);
+  border: 2px solid rgba(255,255,255,0.2);
+  border-radius: 50px;
+  flex-shrink: 0;
+  transition: background .25s, border-color .25s;
+}
+.missing-mode-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--muted);
+  transition: transform .25s, background .25s;
+}
+/* Bekapcsolt állapot */
+.missing-mode-row input:checked + .missing-mode-switch {
+  background: rgba(124,58,237,0.5);
+  border-color: #7c3aed;
+}
+.missing-mode-row input:checked + .missing-mode-switch::after {
+  transform: translateX(24px);
+  background: #a78bfa;
+}
+.missing-mode-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.missing-mode-info strong {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.missing-mode-info small {
+  font-size: .82rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+/* ===== / MISSING MODE TOGGLE ===== */
+
 .start-btn {
   display: block;
   width: 100%;
@@ -157,7 +223,6 @@ body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
   border-bottom: 1px solid rgba(255,255,255,0.08);
   flex-shrink: 0;
   z-index: 10;
-  /* fixed height so it never grows */
   height: 44px;
 }
 .game-title {
@@ -192,17 +257,11 @@ body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
 }
 .header-btn:hover { border-color: var(--red); color: #f87171; }
 
-/* ===== GAME BODY =====
-   PC:     1fr 260px 1fr
-   Tablet landscape: same (260px middle is fine)
-   Narrow: 1fr 70px 1fr
-*/
 .game-body {
   display: grid;
   grid-template-columns: 1fr 260px 1fr;
-  /* fill exactly the remaining height */
   flex: 1;
-  min-height: 0;       /* critical: allows children to shrink below content size */
+  min-height: 0;
   overflow: hidden;
 }
 
@@ -210,10 +269,9 @@ body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
 .team-panel {
   display: flex;
   flex-direction: column;
-  /* padding tighter on small screens via clamp */
   padding: clamp(6px, 1.2vh, 12px);
   gap: clamp(4px, 0.8vh, 8px);
-  overflow: hidden;    /* never overflow the panel */
+  overflow: hidden;
   min-height: 0;
 }
 .team-panel.blue { background: linear-gradient(180deg, #0f1e3d 0%, #1e3a6e 100%); border-right: 2px solid rgba(37,99,235,0.3); }
@@ -249,7 +307,6 @@ body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
   transition: background .2s, border-color .2s;
 }
 .question-text {
-  /* key: clamp against vh so it shrinks on short screens */
   font-size: clamp(1.3rem, 4.5vh, 2.8rem);
   font-weight: 900;
   line-height: 1.1;
@@ -268,37 +325,29 @@ body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
   font-size: clamp(1.2rem, 3.5vh, 2.3rem);
   font-weight: 900;
   letter-spacing: .08em;
-  min-height: 0;         /* shrinkable */
+  min-height: 0;
   flex-shrink: 0;
   transition: border-color .2s;
   color: var(--text);
-  /* guarantee at least one line of text height */
   line-height: 1.2;
 }
 .blue .answer-display.has-value { border-color: var(--blue); }
 .red  .answer-display.has-value { border-color: var(--red); }
 .answer-display.empty { color: var(--muted); }
 
-/* ===== NUMPAD =====
-   Layout: 1 2 3 / 4 5 6 / 7 8 9 / CLR 0 OK
-   The numpad takes all remaining flex space, buttons divide it equally.
-   min-height:0 on the numpad + aspect-ratio on buttons prevents overflow.
-*/
 .numpad {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  /* 4 rows */
   grid-template-rows: repeat(4, 1fr);
   gap: clamp(4px, 0.8vh, 8px);
-  flex: 1;          /* fills remaining panel space */
-  min-height: 0;    /* allow shrink */
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
 }
 
 .numpad-btn {
   border-radius: 13px;
   border: none;
-  /* font scales with the button, not with vw/vh directly */
   font-size: clamp(.9rem, 2.2vh, 1.7rem);
   font-weight: 800;
   cursor: pointer;
@@ -309,7 +358,6 @@ body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
   display: flex;
   align-items: center;
   justify-content: center;
-  /* NO min-height here – let the grid row decide the height */
   width: 100%;
   height: 100%;
   color: white;
@@ -352,7 +400,6 @@ body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
   min-height: 0;
 }
 
-/* stars */
 .rocket-arena::before {
   content: '';
   position: absolute; inset: 0;
@@ -567,19 +614,12 @@ body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
   animation: confetti-fall 0.9s ease-out forwards;
 }
 
-/* ===== RESPONSIVE =====
-   IMPORTANT: only touch layout tweaks below.
-   Desktop (>= 1024px) is untouched.
-*/
-
-/* Tablet landscape & smaller desktop: shrink middle column a bit */
+/* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
   .game-body { grid-template-columns: 1fr 180px 1fr; }
   .lane-tube { width: 20px; }
   .rocket-icon { font-size: clamp(.9rem, 2.2vh, 1.3rem); }
 }
-
-/* Tablet portrait & large phone landscape */
 @media (max-width: 700px) {
   .game-body { grid-template-columns: 1fr 80px 1fr; }
   .lane-tube { width: 16px; }
@@ -588,8 +628,6 @@ body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
   .team-inputs { grid-template-columns: 1fr; }
   .setup-row-2col { grid-template-columns: 1fr; }
 }
-
-/* Small phones */
 @media (max-width: 400px) {
   .game-body { grid-template-columns: 1fr 56px 1fr; }
   .lane-tube { width: 14px; }
@@ -624,6 +662,21 @@ body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
     </div>
   </div>
 
+  <!-- ===== ÚJ: Hiányzó szám mód kapcsoló ===== -->
+  <!-- Ez az egyetlen új kártya a setup képernyőn. -->
+  <div class="setup-card">
+    <h2>🔍 Feladattípus</h2>
+    <label class="missing-mode-row">
+      <input type="checkbox" id="missing-mode-cb">
+      <span class="missing-mode-switch"></span>
+      <span class="missing-mode-info">
+        <strong>Hiányzó szám mód</strong>
+        <small>pl. 6 × ? = 30 &nbsp;•&nbsp; ? + 7 = 15 &nbsp;•&nbsp; 12 ÷ ? = 4</small>
+      </span>
+    </label>
+  </div>
+  <!-- ===== / Hiányzó szám mód kapcsoló ===== -->
+
   <div class="setup-card">
     <h2>👥 Csapatnevek</h2>
     <div class="team-inputs">
@@ -656,6 +709,7 @@ body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
 </div>
 
 <!-- ===== GAME SCREEN ===== -->
+<!-- Változatlan a hagyományos verzióhoz képest -->
 <div id="game-screen" class="screen">
   <header class="game-header">
     <div class="game-title">🚀 MatekVerseny</div>
@@ -754,6 +808,7 @@ body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
 </div>
 
 <!-- ===== RESULT SCREEN ===== -->
+<!-- Változatlan -->
 <div id="result-screen" class="screen">
   <div class="result-card">
     <div class="result-emoji" id="result-emoji">🏆</div>
@@ -785,51 +840,137 @@ body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
 <script>
 /* =====================================================
    QUESTION GENERATOR
+   =====================================================
+   VÁLTOZÁSOK ebben az objektumban:
+     1. config-ba került: missingMode (boolean, alapból false)
+     2. configure() fogadja az új paramétert
+     3. Minden _gen_*() metódus végén: ha missingMode=true,
+        véletlenszerűen döntünk, melyik operandus a hiányzó,
+        majd más text-et és más answer-t adunk vissza.
+        Az interfész (visszatérési alakja: { text, answer })
+        változatlan marad – ezért a GameController._submit()
+        és minden más kód SEMMIT sem érez ebből.
    ===================================================== */
 const QuestionGenerator = {
-  config: { ops: ['add','sub'], difficulty: 'easy' },
-  configure(ops, difficulty) { this.config.ops = ops; this.config.difficulty = difficulty; },
+  config: { ops: ['add','sub'], difficulty: 'easy', missingMode: false },
+
+  configure(ops, difficulty, missingMode) {
+    this.config.ops = ops;
+    this.config.difficulty = difficulty;
+    this.config.missingMode = !!missingMode; /* boolean-ná alakítjuk */
+  },
+
   rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; },
+
   generate() {
     const op = this.config.ops[Math.floor(Math.random() * this.config.ops.length)];
     return this['_gen_' + op]();
   },
+
+  /* ---------- ÖSSZEADÁS ----------
+     Normál:        a + b = ?        answer: a+b
+     Hiányzó mód:
+       variáns 0 → a + ? = (a+b)    answer: b
+       variáns 1 → ? + b = (a+b)    answer: a
+  */
   _gen_add() {
     const d = this.config.difficulty;
     let a, b;
     if (d==='easy')        { a=this.rand(1,10);  b=this.rand(1,10); }
     else if (d==='medium') { a=this.rand(1,50);  b=this.rand(1,50); }
     else                   { a=this.rand(10,99); b=this.rand(10,99); }
-    return { text: `${a} + ${b} = ?`, answer: a+b };
+
+    if (!this.config.missingMode) {
+      return { text: `${a} + ${b} = ?`, answer: a + b };
+    }
+    const sum = a + b;
+    if (Math.random() < 0.5) {
+      return { text: `${a} + ? = ${sum}`, answer: b };
+    } else {
+      return { text: `? + ${b} = ${sum}`, answer: a };
+    }
   },
+
+  /* ---------- KIVONÁS ----------
+     Normál:        a − b = ?        answer: a-b
+     Hiányzó mód:
+       variáns 0 → a − ? = (a-b)    answer: b
+       variáns 1 → ? − b = (a-b)    answer: a   (a = (a-b)+b, garantáltan pozitív)
+  */
   _gen_sub() {
     const d = this.config.difficulty;
     let a, b;
     if (d==='easy')        { a=this.rand(2,10);  b=this.rand(1,a); }
     else if (d==='medium') { a=this.rand(10,50); b=this.rand(1,a); }
     else                   { a=this.rand(20,99); b=this.rand(1,a); }
-    return { text: `${a} − ${b} = ?`, answer: a-b };
+
+    if (!this.config.missingMode) {
+      return { text: `${a} − ${b} = ?`, answer: a - b };
+    }
+    const diff = a - b;
+    if (Math.random() < 0.5) {
+      return { text: `${a} − ? = ${diff}`, answer: b };
+    } else {
+      return { text: `? − ${b} = ${diff}`, answer: a };
+    }
   },
+
+  /* ---------- SZORZÁS ----------
+     Normál:        a × b = ?        answer: a*b
+     Hiányzó mód:
+       variáns 0 → a × ? = (a*b)    answer: b
+       variáns 1 → ? × b = (a*b)    answer: a
+  */
   _gen_mul() {
     const d = this.config.difficulty;
     let a, b;
     if (d==='easy')        { a=this.rand(1,5);  b=this.rand(1,5);  }
     else if (d==='medium') { a=this.rand(2,9);  b=this.rand(2,9);  }
     else                   { a=this.rand(2,12); b=this.rand(2,12); }
-    return { text: `${a} × ${b} = ?`, answer: a*b };
+
+    if (!this.config.missingMode) {
+      return { text: `${a} × ${b} = ?`, answer: a * b };
+    }
+    const product = a * b;
+    if (Math.random() < 0.5) {
+      return { text: `${a} × ? = ${product}`, answer: b };
+    } else {
+      return { text: `? × ${b} = ${product}`, answer: a };
+    }
   },
+
+  /* ---------- OSZTÁS ----------
+     A generátor mindig egész osztót és egész hányadost garantál:
+     a = b * res  →  a ÷ b = res
+
+     Normál:        (b*res) ÷ b = ?       answer: res
+     Hiányzó mód:
+       variáns 0 → (b*res) ÷ ? = res      answer: b
+       variáns 1 → ? ÷ b = res            answer: b*res
+     Mindkét variáns egész számot vár be – a logika makulátlan.
+  */
   _gen_div() {
     const d = this.config.difficulty;
     let b, res;
     if (d==='easy')        { b=this.rand(1,5);  res=this.rand(1,5);  }
     else if (d==='medium') { b=this.rand(2,9);  res=this.rand(2,9);  }
     else                   { b=this.rand(2,12); res=this.rand(2,12); }
-    return { text: `${b*res} ÷ ${b} = ?`, answer: res };
+    const a = b * res;
+
+    if (!this.config.missingMode) {
+      return { text: `${a} ÷ ${b} = ?`, answer: res };
+    }
+    if (Math.random() < 0.5) {
+      return { text: `${a} ÷ ? = ${res}`, answer: b };
+    } else {
+      return { text: `? ÷ ${b} = ${res}`, answer: a };
+    }
   }
 };
 
 /* =====================================================
    ROCKET ARENA
+   – VÁLTOZATLAN –
    ===================================================== */
 const RocketArena = {
   winScore: 10,
@@ -870,6 +1011,10 @@ const RocketArena = {
 
 /* =====================================================
    GAME CONTROLLER
+   – VÁLTOZATLAN –
+   A _submit() csak { answer } értékét hasonlítja össze
+   a beírt számmal, ezért a hiányzó szám mód teljesen
+   átlátszó számára.
    ===================================================== */
 const GameController = {
   state: {
@@ -895,7 +1040,8 @@ const GameController = {
       timeLeft:settings.timeLimit, winScore:settings.winScore
     });
     clearInterval(s.timer);
-    QuestionGenerator.configure(settings.ops, settings.difficulty);
+    /* missingMode átadása a generátornak – ez az egyetlen hely ahol az új flag megjelenik a GameController-ben */
+    QuestionGenerator.configure(settings.ops, settings.difficulty, settings.missingMode);
     RocketArena.init(settings.winScore);
     document.getElementById('blue-name').textContent = s.blueName;
     document.getElementById('red-name').textContent  = s.redName;
@@ -1024,6 +1170,12 @@ const GameController = {
 
 /* =====================================================
    UI & EVENT BINDINGS
+   =====================================================
+   Változás: a start-btn handler kiolvas egy új értéket:
+     missingMode = document.getElementById('missing-mode-cb').checked
+   Ezt átadja a GameController.init()-nek, amely tovább
+   adja a QuestionGenerator.configure()-nek.
+   Minden más kötés VÁLTOZATLAN.
    ===================================================== */
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -1046,13 +1198,14 @@ document.querySelectorAll('#diff-group .toggle-btn').forEach(btn=>{
 });
 
 document.getElementById('start-btn').addEventListener('click',()=>{
-  const ops=     [...document.querySelectorAll('#ops-group .toggle-btn.active')].map(b=>b.dataset.op);
-  const diff=    document.querySelector('#diff-group .toggle-btn.active').dataset.diff;
-  const blueName=document.getElementById('name-blue').value.trim()  ||'Kék csapat';
-  const redName= document.getElementById('name-red').value.trim()   ||'Piros csapat';
-  const timeLimit=parseInt(document.getElementById('time-limit').value)||120;
-  const winScore= parseInt(document.getElementById('win-score').value) ||10;
-  GameController.init({ops,difficulty:diff,blueName,redName,timeLimit,winScore});
+  const ops=        [...document.querySelectorAll('#ops-group .toggle-btn.active')].map(b=>b.dataset.op);
+  const diff=       document.querySelector('#diff-group .toggle-btn.active').dataset.diff;
+  const missingMode=document.getElementById('missing-mode-cb').checked; /* ← ÚJ, egyetlen új sor */
+  const blueName=   document.getElementById('name-blue').value.trim()  ||'Kék csapat';
+  const redName=    document.getElementById('name-red').value.trim()   ||'Piros csapat';
+  const timeLimit=  parseInt(document.getElementById('time-limit').value)||120;
+  const winScore=   parseInt(document.getElementById('win-score').value) ||10;
+  GameController.init({ops, difficulty:diff, missingMode, blueName, redName, timeLimit, winScore});
   showScreen('game-screen');
   setTimeout(()=>GameController.start(),100);
 });
@@ -1078,16 +1231,22 @@ document.getElementById('quit-btn').addEventListener('click',()=>{
   }
 });
 
+/* play-again: megőrzi a missingMode-ot is a QuestionGenerator.config-ból */
 document.getElementById('play-again-btn').addEventListener('click',()=>{
   const s=GameController.state;
   GameController.init({
-    ops:QuestionGenerator.config.ops, difficulty:QuestionGenerator.config.difficulty,
-    blueName:s.blueName, redName:s.redName,
-    timeLimit:s.winScore*12, winScore:s.winScore
+    ops:        QuestionGenerator.config.ops,
+    difficulty: QuestionGenerator.config.difficulty,
+    missingMode:QuestionGenerator.config.missingMode, /* ← megőrzi az újrajátszáshoz */
+    blueName:   s.blueName,
+    redName:    s.redName,
+    timeLimit:  s.winScore*12,
+    winScore:   s.winScore
   });
   showScreen('game-screen');
   setTimeout(()=>GameController.start(),100);
 });
+
 document.getElementById('menu-btn').addEventListener('click',()=>{
   clearInterval(GameController.state.timer);
   GameController.state.running=false;
